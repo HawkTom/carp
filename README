@@ -1,0 +1,23 @@
+```
+inst_tasks: 结构体数组，数组中的每个元素为个task，同一条边的两个方向为两个task
+，两个task的id相差需求边的总数。 0元素不用
+
+inst_arcs： 结构体数组，数组中的每个元素为一条边，内行图中所有的边，每条边
+的两个方向不相同，id相差边的总数，0号元素不用
+
+trav_cost： 图中边的cost，
+serve_cost： 图中需求边的cost
+mini_cost:  两两之间的最短距离
+
+以上三个距离matrix的第一行第一列都舍弃不使用。
+
+individual: 结构体
+
+int Sequence： 路径，用0分割，存储task id
+int Assignment[250]： 
+int TotalCost： 总的cost
+int Loads：每条路径的负载，荷载 
+int TotalVioLoad：每条路超过容量部分的总和
+double Fitness：带惩罚系数的适应度
+
+```

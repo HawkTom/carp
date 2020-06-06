@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/hao/Documents/Projects/carp/functions.h
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+
+/Users/hao/Documents/Projects/carp/heuristic.c
+iso646.h
+-
+functions.h
+/Users/hao/Documents/Projects/carp/functions.h
+
