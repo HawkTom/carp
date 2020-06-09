@@ -36,6 +36,14 @@ extern int serve_cost[MAX_NODE_TAG_LENGTH][MAX_NODE_TAG_LENGTH];
 extern int min_cost[MAX_NODE_TAG_LENGTH][MAX_NODE_TAG_LENGTH];
 extern int shortest_path[MAX_NODE_TAG_LENGTH][MAX_NODE_TAG_LENGTH][MAX_NODE_TAG_LENGTH];
 
+extern int cost_backup[MAX_NODE_TAG_LENGTH][MAX_NODE_TAG_LENGTH];
+extern int demand[MAX_NODE_TAG_LENGTH][MAX_NODE_TAG_LENGTH];
+extern int costlb;
+extern int costub;
+extern int demandlb;
+extern int demandub;
+
+
 typedef struct task
 {
     int head_node;
@@ -52,6 +60,7 @@ typedef struct arc
     int head_node;
     int tail_node;
     int trav_cost;
+    unsigned int change;
 } Arc;
 
 typedef struct individual
@@ -65,6 +74,11 @@ typedef struct individual
 } Individual;
 
 void mod_dijkstra();
+
+void readMap(Task *inst_tasks, Arc *inst_arcs);
+
+
+
 
 int max(int *Array);
 

@@ -3,6 +3,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/carp.dir/functions.c.o"
   "CMakeFiles/carp.dir/heuristic.c.o"
   "CMakeFiles/carp.dir/main.c.o"
+  "CMakeFiles/carp.dir/readmap.c.o"
+  "CMakeFiles/carp.dir/simulator.c.o"
   "carp"
   "carp.pdb"
 )

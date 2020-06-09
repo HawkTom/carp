@@ -231,6 +231,60 @@ main.c.s:
 	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/main.c.s
 .PHONY : main.c.s
 
+readmap.o: readmap.c.o
+
+.PHONY : readmap.o
+
+# target to build an object file
+readmap.c.o:
+	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/readmap.c.o
+.PHONY : readmap.c.o
+
+readmap.i: readmap.c.i
+
+.PHONY : readmap.i
+
+# target to preprocess a source file
+readmap.c.i:
+	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/readmap.c.i
+.PHONY : readmap.c.i
+
+readmap.s: readmap.c.s
+
+.PHONY : readmap.s
+
+# target to generate assembly for a file
+readmap.c.s:
+	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/readmap.c.s
+.PHONY : readmap.c.s
+
+simulator.o: simulator.c.o
+
+.PHONY : simulator.o
+
+# target to build an object file
+simulator.c.o:
+	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/simulator.c.o
+.PHONY : simulator.c.o
+
+simulator.i: simulator.c.i
+
+.PHONY : simulator.i
+
+# target to preprocess a source file
+simulator.c.i:
+	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/simulator.c.i
+.PHONY : simulator.c.i
+
+simulator.s: simulator.c.s
+
+.PHONY : simulator.s
+
+# target to generate assembly for a file
+simulator.c.s:
+	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/simulator.c.s
+.PHONY : simulator.c.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -252,6 +306,12 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... readmap.o"
+	@echo "... readmap.i"
+	@echo "... readmap.s"
+	@echo "... simulator.o"
+	@echo "... simulator.i"
+	@echo "... simulator.s"
 .PHONY : help
 
 

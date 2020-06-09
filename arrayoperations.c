@@ -5,6 +5,7 @@
 
 #include "functions.h"
 
+
 int max(int *Array)
 {
     int Length = Array[0];

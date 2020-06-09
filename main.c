@@ -23,106 +23,18 @@ int serve_cost[MAX_NODE_TAG_LENGTH][MAX_NODE_TAG_LENGTH];
 int min_cost[MAX_NODE_TAG_LENGTH][MAX_NODE_TAG_LENGTH];
 int shortest_path[MAX_NODE_TAG_LENGTH][MAX_NODE_TAG_LENGTH][MAX_NODE_TAG_LENGTH];
 
+
+
 void ShowMatrix(int (*Min)[MAX_NODE_TAG_LENGTH], int dim);
 
 int main()
 {
-    FILE *fp;
-
-    char dummy[50];
 
 
     Task inst_tasks[MAX_TASKS_TAG_LENGTH];
     Arc inst_arcs[MAX_ARCS_TAG_LENGTH];
 
-    fp = fopen("../egl-e1-C.dat", "r");
-
-    while (fscanf(fp, "%s", dummy) != EOF)
-    {
-
-        if (strcmp(dummy, "VERTICES")==0)
-        {
-            fscanf(fp, "%s", dummy);
-            fscanf(fp, "%d", &vertex_num);
-        }
-        else if (strcmp(dummy, "ARISTAS_REQ") == 0)
-        {
-            fscanf(fp, "%s", dummy);
-            fscanf(fp, "%d", &req_edge_num);
-        }
-        else if (strcmp(dummy, "ARISTAS_NOREQ")==0)
-        {
-            fscanf(fp, "%s", dummy);
-            fscanf(fp, "%d", &nonreq_edge_num);
-        }
-        else if (strcmp(dummy, "VEHICULOS")==0)
-        {
-            fscanf(fp, "%s", dummy);
-            fscanf(fp, "%d", &vehicle_num);
-        }
-        else if (strcmp(dummy, "CAPACIDAD")==0)
-        {
-            fscanf(fp, "%s", dummy);
-            fscanf(fp, "%d", &capacity);
-        }
-        else if (strcmp(dummy, "LISTA_ARISTAS_REQ")==0) {
-
-            fscanf(fp, "%s", dummy);
-            task_num = 2 * req_edge_num + req_arc_num;
-            total_arc_num = task_num + 2 * nonreq_edge_num + nonreq_arc_num;
-            for (int i = 1; i <= req_edge_num; i++) {
-                fscanf(fp, "%s", dummy);
-                fscanf(fp, "%d,", &inst_tasks[i].head_node);
-                fscanf(fp, "%d)", &inst_tasks[i].tail_node);
-                fscanf(fp, "%s", dummy);
-                fscanf(fp, "%d", &inst_tasks[i].serv_cost);
-                fscanf(fp, "%s", dummy);
-                fscanf(fp, "%d", &inst_tasks[i].demand);
-
-                inst_tasks[i].dead_cost = inst_tasks[i].serv_cost;
-                inst_tasks[i].inverse = i + req_edge_num;
-
-                inst_tasks[i + req_edge_num].head_node = inst_tasks[i].tail_node;
-                inst_tasks[i + req_edge_num].tail_node = inst_tasks[i].head_node;
-                inst_tasks[i + req_edge_num].dead_cost = inst_tasks[i].dead_cost;
-                inst_tasks[i + req_edge_num].serv_cost = inst_tasks[i].serv_cost;
-                inst_tasks[i + req_edge_num].demand = inst_tasks[i].demand;
-                inst_tasks[i + req_edge_num].inverse = i;
-
-                inst_arcs[i].head_node = inst_tasks[i].head_node;
-                inst_arcs[i].tail_node = inst_tasks[i].tail_node;
-                inst_arcs[i].trav_cost = inst_tasks[i].dead_cost;
-                inst_arcs[i + req_edge_num].head_node = inst_arcs[i].tail_node;
-                inst_arcs[i + req_edge_num].tail_node = inst_arcs[i].head_node;
-                inst_arcs[i + req_edge_num].trav_cost = inst_arcs[i].trav_cost;
-            }
-        }
-        else if (strcmp(dummy, "LISTA_ARISTAS_NOREQ")==0)
-        {
-            fscanf(fp, "%s", dummy);
-            for (int i=task_num+1; i<=task_num+nonreq_edge_num;i++)
-            {
-                fscanf(fp, "%s", dummy);
-                fscanf(fp, "%d,", &inst_arcs[i].head_node);
-                fscanf(fp, "%d)", &inst_arcs[i].tail_node);
-                fscanf(fp, "%s", dummy);
-                fscanf(fp, "%d", &inst_arcs[i].trav_cost);
-
-                inst_arcs[i + nonreq_edge_num].head_node = inst_arcs[i].tail_node;
-                inst_arcs[i + nonreq_edge_num].tail_node = inst_arcs[i].head_node;
-                inst_arcs[i + nonreq_edge_num].trav_cost = inst_arcs[i].trav_cost;
-
-            }
-        }
-        else if (strcmp(dummy, "DEPOSITO")==0)
-        {
-            fscanf(fp, "%s", dummy);
-            fscanf(fp, "%d", &DEPOT);
-        }
-
-    }
-
-    fclose(fp);
+    readMap(inst_tasks, inst_arcs);
 
     // inst_tasks[dummy_cycle]
 
@@ -146,6 +58,7 @@ int main()
     for (int i=1; i<=total_arc_num; i++)
     {
         trav_cost[inst_arcs[i].head_node][inst_arcs[i].tail_node] = inst_arcs[i].trav_cost;
+        cost_backup[inst_arcs[i].head_node][inst_arcs[i].tail_node] = inst_arcs[i].trav_cost;
     }
 
     mod_dijkstra();

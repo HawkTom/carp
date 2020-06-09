@@ -94,6 +94,12 @@
 		<Unit filename="/Users/hao/Documents/Projects/carp/main.c">
 			<Option target="carp"/>
 		</Unit>
+		<Unit filename="/Users/hao/Documents/Projects/carp/readmap.c">
+			<Option target="carp"/>
+		</Unit>
+		<Unit filename="/Users/hao/Documents/Projects/carp/simulator.c">
+			<Option target="carp"/>
+		</Unit>
 		<Unit filename="/Users/hao/Documents/Projects/carp/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>
