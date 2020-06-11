@@ -14,3 +14,9 @@ CMakeFiles/carp.dir/main.c.o: ../functions.h
 CMakeFiles/carp.dir/main.c.o: ../heutistic.h
 CMakeFiles/carp.dir/main.c.o: ../main.c
 
+CMakeFiles/carp.dir/readmap.c.o: ../functions.h
+CMakeFiles/carp.dir/readmap.c.o: ../readmap.c
+
+CMakeFiles/carp.dir/simulator.c.o: ../functions.h
+CMakeFiles/carp.dir/simulator.c.o: ../simulator.c
+

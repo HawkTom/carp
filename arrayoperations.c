@@ -151,28 +151,3 @@ int FindTask(int a, int b, const Task *inst_tasks, int NO_Task)
 
     return 0;
 }
-
-void MergeTwoRoutes(int *Route1, int invert1, int *Route2, int invert2, const Task *inst_tasks)
-// merge two routes with specific direction
-{
-    int tmp;
-    // 0 ----> 1
-    if (invert1)
-    {
-        for (int i = 1; i <= Route1[1]; i++)
-        {
-            Route1[i] = inst_tasks[Route1[i]].inverse;
-        }
-        ReverseDirection(Route1, 1, Route1[0]);
-    }
-
-    if (invert2)
-    {
-        for (int i = 1; i <= Route2[1]; i++)
-        {
-            Route2[i] = inst_tasks[Route2[i]].inverse;
-        }
-        ReverseDirection(Route2, 1, Route2[0]);
-    }
-    JoinArray(Route1, Route2);
-}

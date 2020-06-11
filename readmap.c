@@ -74,10 +74,12 @@ void readMap(Task *inst_tasks, Arc *inst_arcs)
                 inst_arcs[i].tail_node = inst_tasks[i].tail_node;
                 inst_arcs[i].trav_cost = inst_tasks[i].dead_cost;
                 inst_arcs[i].change = 0;
+                inst_arcs[i].link = 0;
                 inst_arcs[i + req_edge_num].head_node = inst_arcs[i].tail_node;
                 inst_arcs[i + req_edge_num].tail_node = inst_arcs[i].head_node;
                 inst_arcs[i + req_edge_num].trav_cost = inst_arcs[i].trav_cost;
                 inst_arcs[i + req_edge_num].change = 0;
+                inst_arcs[i+ req_edge_num].link = 0;
 
                 if (costlb > inst_tasks[i].dead_cost)
                     costlb = inst_tasks[i].dead_cost;
@@ -104,11 +106,13 @@ void readMap(Task *inst_tasks, Arc *inst_arcs)
                 fscanf(fp, "%s", dummy);
                 fscanf(fp, "%d", &inst_arcs[i].trav_cost);
                 inst_arcs[i].change = 0;
+                inst_arcs[i].link = 0;
 
                 inst_arcs[i + nonreq_edge_num].head_node = inst_arcs[i].tail_node;
                 inst_arcs[i + nonreq_edge_num].tail_node = inst_arcs[i].head_node;
                 inst_arcs[i + nonreq_edge_num].trav_cost = inst_arcs[i].trav_cost;
                 inst_arcs[i + nonreq_edge_num].change = 0;
+                inst_arcs[i + nonreq_edge_num].link = 0;
 
                 if (costlb > inst_arcs[i].trav_cost)
                     costlb = inst_arcs[i].trav_cost;

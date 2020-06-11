@@ -79,6 +79,12 @@
 		<Unit filename="/Users/hao/Documents/Projects/carp/arrayoperations.c">
 			<Option target="carp"/>
 		</Unit>
+		<Unit filename="/Users/hao/Documents/Projects/carp/dheuristic.c">
+			<Option target="carp"/>
+		</Unit>
+		<Unit filename="/Users/hao/Documents/Projects/carp/dheuristic.h">
+			<Option target="carp"/>
+		</Unit>
 		<Unit filename="/Users/hao/Documents/Projects/carp/functions.c">
 			<Option target="carp"/>
 		</Unit>

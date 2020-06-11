@@ -150,6 +150,33 @@ arrayoperations.c.s:
 	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/arrayoperations.c.s
 .PHONY : arrayoperations.c.s
 
+dheuristic.o: dheuristic.c.o
+
+.PHONY : dheuristic.o
+
+# target to build an object file
+dheuristic.c.o:
+	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/dheuristic.c.o
+.PHONY : dheuristic.c.o
+
+dheuristic.i: dheuristic.c.i
+
+.PHONY : dheuristic.i
+
+# target to preprocess a source file
+dheuristic.c.i:
+	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/dheuristic.c.i
+.PHONY : dheuristic.c.i
+
+dheuristic.s: dheuristic.c.s
+
+.PHONY : dheuristic.s
+
+# target to generate assembly for a file
+dheuristic.c.s:
+	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/dheuristic.c.s
+.PHONY : dheuristic.c.s
+
 functions.o: functions.c.o
 
 .PHONY : functions.o
@@ -297,6 +324,9 @@ help:
 	@echo "... arrayoperations.o"
 	@echo "... arrayoperations.i"
 	@echo "... arrayoperations.s"
+	@echo "... dheuristic.o"
+	@echo "... dheuristic.i"
+	@echo "... dheuristic.s"
 	@echo "... functions.o"
 	@echo "... functions.i"
 	@echo "... functions.s"

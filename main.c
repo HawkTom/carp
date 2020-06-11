@@ -23,6 +23,8 @@ int serve_cost[MAX_NODE_TAG_LENGTH][MAX_NODE_TAG_LENGTH];
 int min_cost[MAX_NODE_TAG_LENGTH][MAX_NODE_TAG_LENGTH];
 int shortest_path[MAX_NODE_TAG_LENGTH][MAX_NODE_TAG_LENGTH][MAX_NODE_TAG_LENGTH];
 
+int cost_backup[MAX_NODE_TAG_LENGTH][MAX_NODE_TAG_LENGTH];
+
 
 
 void ShowMatrix(int (*Min)[MAX_NODE_TAG_LENGTH], int dim);
@@ -30,13 +32,11 @@ void ShowMatrix(int (*Min)[MAX_NODE_TAG_LENGTH], int dim);
 int main()
 {
 
-
     Task inst_tasks[MAX_TASKS_TAG_LENGTH];
     Arc inst_arcs[MAX_ARCS_TAG_LENGTH];
 
     readMap(inst_tasks, inst_arcs);
 
-    // inst_tasks[dummy_cycle]
 
     for (int i=1; i<=vertex_num; i++)
     {
@@ -47,8 +47,8 @@ int main()
         }
     }
 
-//    trav_cost[1][0] = 0;
-//    trav_cost[0][1] = 0;
+    trav_cost[1][0] = 0;
+    trav_cost[0][1] = 0;
 
     for (int i=1; i<=task_num; i++)
     {

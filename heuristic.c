@@ -5,6 +5,18 @@
 
 #include "functions.h"
 
+
+void GetConnectivePiece(int Root, int CurrentPiece, int *PieceMark, int (*Neighbors)[MAX_NODE_TAG_LENGTH]);
+
+void GetMinCostTree(int (*CPMCTree)[MAX_NODE_TAG_LENGTH], int (*CPMinCost)[MAX_NODE_TAG_LENGTH]);
+
+void GetEulerRoute(int *EulerRoute, int (*AdMatrix)[MAX_NODE_TAG_LENGTH], int *Nodes);
+
+void FindCircuit(int *EulerRoute, int CurrentNode, int (*AdMatrix)[MAX_NODE_TAG_LENGTH], int *Nodes);
+
+void EvenAllOddNodes(int (*AdMatrix)[MAX_NODE_TAG_LENGTH], int *OddNodes);
+
+
 int split(int *split_task_seq, int *one_task_seq, const Task *inst_tasks)
 {
     int V[MAX_TASK_TAG_LENGTH], P[MAX_TASK_TAG_LENGTH];
@@ -80,7 +92,6 @@ int split(int *split_task_seq, int *one_task_seq, const Task *inst_tasks)
 
 }
 
-
 int fleet_limited_split(int *split_task_seq, int *one_task_seq, const Task *inst_tasks)
 {
     int aux_cost[MAX_TASK_SEG_LENGTH][MAX_TASK_TAG_LENGTH];
@@ -105,7 +116,7 @@ int fleet_limited_split(int *split_task_seq, int *one_task_seq, const Task *inst
             opt_cost[i][j] = INF;
         }
     }
-    opt_cost[0][0];
+    opt_cost[0][0] = 0;
 
     for (i = 0; i<=one_task_seq[0]; i++)
     {
@@ -383,7 +394,6 @@ void augment_merge(Individual *am_indi, const Task *inst_tasks)
 
 
 }
-
 
 void path_scanning(Individual *ps_indi, const Task *inst_tasks, const int *serve_mark)
 {
@@ -1106,7 +1116,6 @@ void path_scanning(Individual *ps_indi, const Task *inst_tasks, const int *serve
 
     ps_indi->TotalVioLoad = 0;
 }
-
 
 void FredericksonHeuristic(int *FHRoute, int *Route, const Task *inst_tasks)
 {

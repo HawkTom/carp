@@ -37,7 +37,6 @@ extern int min_cost[MAX_NODE_TAG_LENGTH][MAX_NODE_TAG_LENGTH];
 extern int shortest_path[MAX_NODE_TAG_LENGTH][MAX_NODE_TAG_LENGTH][MAX_NODE_TAG_LENGTH];
 
 extern int cost_backup[MAX_NODE_TAG_LENGTH][MAX_NODE_TAG_LENGTH];
-extern int demand[MAX_NODE_TAG_LENGTH][MAX_NODE_TAG_LENGTH];
 extern int costlb;
 extern int costub;
 extern int demandlb;
@@ -61,7 +60,10 @@ typedef struct arc
     int tail_node;
     int trav_cost;
     unsigned int change;
+    int link;
 } Arc;
+
+
 
 typedef struct individual
 {
@@ -71,12 +73,14 @@ typedef struct individual
     int Loads[50];
     int TotalVioLoad;
     double Fitness;
+//    int start[50]; // for DCARP
 } Individual;
 
 void mod_dijkstra();
 
 void readMap(Task *inst_tasks, Arc *inst_arcs);
 
+void nextScenario(Individual *Solution, const Task *inst_tasks, const Arc *inst_arcs, unsigned int seed);
 
 
 
@@ -102,19 +106,7 @@ int RandChoose(int n);
 
 void ReverseDirection(int *Array, int k1, int k2);
 
-void MergeTwoRoutes(int *Route1, int invert1, int *Route2, int invert2, const Task *inst_tasks);
 
-
-
-void GetConnectivePiece(int Root, int CurrentPiece, int *PieceMark, int (*Neighbors)[MAX_NODE_TAG_LENGTH]);
-
-void GetMinCostTree(int (*CPMCTree)[MAX_NODE_TAG_LENGTH], int (*CPMinCost)[MAX_NODE_TAG_LENGTH]);
-
-void GetEulerRoute(int *EulerRoute, int (*AdMatrix)[MAX_NODE_TAG_LENGTH], int *Nodes);
-
-void FindCircuit(int *EulerRoute, int CurrentNode, int (*AdMatrix)[MAX_NODE_TAG_LENGTH], int *Nodes);
-
-void EvenAllOddNodes(int (*AdMatrix)[MAX_NODE_TAG_LENGTH], int *OddNodes);
 
 
 #endif //CARP_FUNCTIONS_H
