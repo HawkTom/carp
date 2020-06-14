@@ -1149,6 +1149,7 @@ void FredericksonHeuristic(int *FHRoute, int *Route, const Task *inst_tasks)
 
 //    int ConnectivePieceNodes[2*Route[0]+2][2*Route[0]+2];
     int ConnectivePieceNodes[MAX_NODE_TAG_LENGTH][MAX_NODE_TAG_LENGTH];
+    memset(ConnectivePieceNodes, 0, sizeof(ConnectivePieceNodes));
     ConnectivePieceNodes[0][0] = 0;
 
     int PieceMark[MAX_NODE_TAG_LENGTH];

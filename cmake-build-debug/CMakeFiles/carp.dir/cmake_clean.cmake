@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/carp.dir/TSA/TSA.c.o"
+  "CMakeFiles/carp.dir/TSA/tsals.c.o"
   "CMakeFiles/carp.dir/arrayoperations.c.o"
   "CMakeFiles/carp.dir/dheuristic.c.o"
   "CMakeFiles/carp.dir/functions.c.o"

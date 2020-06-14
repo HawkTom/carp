@@ -123,6 +123,60 @@ carp/fast:
 	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/build
 .PHONY : carp/fast
 
+TSA/TSA.o: TSA/TSA.c.o
+
+.PHONY : TSA/TSA.o
+
+# target to build an object file
+TSA/TSA.c.o:
+	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/TSA/TSA.c.o
+.PHONY : TSA/TSA.c.o
+
+TSA/TSA.i: TSA/TSA.c.i
+
+.PHONY : TSA/TSA.i
+
+# target to preprocess a source file
+TSA/TSA.c.i:
+	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/TSA/TSA.c.i
+.PHONY : TSA/TSA.c.i
+
+TSA/TSA.s: TSA/TSA.c.s
+
+.PHONY : TSA/TSA.s
+
+# target to generate assembly for a file
+TSA/TSA.c.s:
+	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/TSA/TSA.c.s
+.PHONY : TSA/TSA.c.s
+
+TSA/tsals.o: TSA/tsals.c.o
+
+.PHONY : TSA/tsals.o
+
+# target to build an object file
+TSA/tsals.c.o:
+	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/TSA/tsals.c.o
+.PHONY : TSA/tsals.c.o
+
+TSA/tsals.i: TSA/tsals.c.i
+
+.PHONY : TSA/tsals.i
+
+# target to preprocess a source file
+TSA/tsals.c.i:
+	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/TSA/tsals.c.i
+.PHONY : TSA/tsals.c.i
+
+TSA/tsals.s: TSA/tsals.c.s
+
+.PHONY : TSA/tsals.s
+
+# target to generate assembly for a file
+TSA/tsals.c.s:
+	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/TSA/tsals.c.s
+.PHONY : TSA/tsals.c.s
+
 arrayoperations.o: arrayoperations.c.o
 
 .PHONY : arrayoperations.o
@@ -321,6 +375,12 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... carp"
+	@echo "... TSA/TSA.o"
+	@echo "... TSA/TSA.i"
+	@echo "... TSA/TSA.s"
+	@echo "... TSA/tsals.o"
+	@echo "... TSA/tsals.i"
+	@echo "... TSA/tsals.s"
 	@echo "... arrayoperations.o"
 	@echo "... arrayoperations.i"
 	@echo "... arrayoperations.s"

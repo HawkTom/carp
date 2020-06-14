@@ -76,6 +76,15 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/Users/hao/Documents/Projects/carp/TSA/TSA.c">
+			<Option target="carp"/>
+		</Unit>
+		<Unit filename="/Users/hao/Documents/Projects/carp/TSA/TSA.h">
+			<Option target="carp"/>
+		</Unit>
+		<Unit filename="/Users/hao/Documents/Projects/carp/TSA/tsals.c">
+			<Option target="carp"/>
+		</Unit>
 		<Unit filename="/Users/hao/Documents/Projects/carp/arrayoperations.c">
 			<Option target="carp"/>
 		</Unit>

@@ -20,4 +20,23 @@ int Loads：每条路径的负载，荷载
 int TotalVioLoad：每条路超过容量部分的总和
 double Fitness：带惩罚系数的适应度
 
+Array function:
+1. AssignArray(int *Array1, int *Array2): 
+    assign array1 to array2
+
+2. AssignSubArray(int *Array1, int k1, int k2, int *Array2): 
+    assign array1[k1:k2] to array2
+
+3. JoinArray(int *JointArray, int *Array):
+    JointArray = JointArray + Array
+
+4. find_ele_positions(int *positions, int *a, int e)
+    find element e in a
+
+5. delete_element(int *a, int k)
+    delete element k in a
+
+6. add_element(int *a, int e, int k):
+    a[1:k-1] + e + a[k:end]
+
 ```

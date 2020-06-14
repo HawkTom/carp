@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include <math.h>
 
 #define MAX_TASKS_TAG_LENGTH 1001
 #define MAX_ARCS_TAG_LENGTH 1001
@@ -89,6 +91,8 @@ int max(int *Array);
 void find_ele_positions(int *positions, int *a, int e);
 
 void delete_element(int *a, int k);
+
+void add_element(int *a, int e, int k);
 
 int get_task_seq_total_cost(int *task_seq, const Task *inst_tasks);
 

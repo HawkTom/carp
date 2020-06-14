@@ -116,6 +116,23 @@ void delete_element(int *a, int k)
     a[0] --;
 }
 
+void add_element(int *a, int e, int k)
+// add element e in k position of a
+{
+    if (k < 1 || k > a[0]+1)
+    {
+        printf("the inserting position is wrong!\n");
+        exit(0);
+    }
+
+    a[0] ++;
+    for (int i = a[0]; i > k; i--)
+    {
+        a[i] = a[i-1];
+    }
+    a[k] = e;
+}
+
 int get_task_seq_total_cost(int *task_seq, const Task *inst_tasks)
 {
     int total_cost =  0;

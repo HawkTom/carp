@@ -6,6 +6,7 @@
 #include <math.h>
 #include "functions.h"
 #include "heutistic.h"
+#include "TSA/TSA.h"
 
 
 int req_arc_num = 0; //NRA
@@ -63,47 +64,12 @@ int main()
 
     mod_dijkstra();
 //    ShowMatrix(min_cost, vertex_num);
-
-    int NVer, NRE, NRA, NNR, NVeh, Cap, LLB;
-    NVer = vertex_num;
-    NRE = req_edge_num;
-    NRA = req_arc_num;
-    NNR = 2*nonreq_edge_num+nonreq_arc_num;
-    NVeh = vehicle_num;
-    Cap = capacity;
-//    LLB = LowerBound;
-
-    // Initialization
-    Individual InitSolution;
-    int serve_mark[MAX_TASKS_TAG_LENGTH];
-    for (int i=1; i<=task_num; i++)
-    {
-        serve_mark[i] = 1;
-    }
+    TSA(inst_tasks);
 
 
-    augment_merge(&InitSolution, inst_tasks);
-    path_scanning(&InitSolution, inst_tasks, serve_mark);
 
-    int Positions[MAX_ROUTE_TAG_LENGTH];
-    int FHRoute[MAX_TASK_SEG_LENGTH], Route[MAX_TASK_SEG_LENGTH];
-
-    find_ele_positions(Positions, InitSolution.Sequence, 0);
-
-    AssignSubArray(InitSolution.Sequence, Positions[3], Positions[4], Route);
-
-    FredericksonHeuristic(FHRoute, Route, inst_tasks);
-
-    // Parameter
-    int FSI = 1;
-    int FDI = 1;
-    int FSWAP = 1;
-
-    // parmater for iteration
-    int npi, mnpi, nti, mnti;
-    mnpi = 900 * sqrt(NRE+NRA);
-    npi = 1;
-    nti = 1;
+//    augment_merge(&InitSolution, inst_tasks);
+//    path_scanning(&InitSolution, inst_tasks, serve_mark);
 
     printf("Hello, World!\n");
     return 0;
