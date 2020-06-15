@@ -5,7 +5,7 @@
 
 #include "TSA.h"
 
-void TSA(Task *inst_tasks)
+void TSA(const Task *inst_tasks)
 {
     int i, j,k, m;
 
@@ -204,6 +204,7 @@ void TSA(Task *inst_tasks)
         }
 
         // repair operator
+        /*
         if (NextSolution.TotalCost < BestFsbSolution.TotalCost && NextSolution.TotalVioLoad > 0)
         {
             TmpSolution = NextSolution;
@@ -225,6 +226,7 @@ void TSA(Task *inst_tasks)
                 FitCost[FitCost[0][0]][2] = BestFsbSolution.TotalCost;
             }
         }
+        */
 
         //
         if (NextSolution.TotalVioLoad == 0)

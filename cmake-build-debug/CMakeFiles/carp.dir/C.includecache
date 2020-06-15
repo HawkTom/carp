@@ -6,19 +6,13 @@
 
 #IncludeRegexTransform: 
 
-/Users/hao/Documents/Projects/carp/TSA/TSA.c
-TSA.h
-/Users/hao/Documents/Projects/carp/TSA/TSA.h
+/Users/hao/Documents/Projects/carp/MAENS/MAENS.c
+MAENS.h
+/Users/hao/Documents/Projects/carp/MAENS/MAENS.h
 
-/Users/hao/Documents/Projects/carp/TSA/TSA.h
+/Users/hao/Documents/Projects/carp/MAENS/MAENS.h
 ../functions.h
 /Users/hao/Documents/Projects/carp/functions.h
-../heutistic.h
-/Users/hao/Documents/Projects/carp/heutistic.h
-
-/Users/hao/Documents/Projects/carp/TSA/tsals.c
-TSA.h
-/Users/hao/Documents/Projects/carp/TSA/TSA.h
 
 /Users/hao/Documents/Projects/carp/functions.h
 stdio.h
@@ -31,6 +25,4 @@ time.h
 -
 math.h
 -
-
-/Users/hao/Documents/Projects/carp/heutistic.h
 

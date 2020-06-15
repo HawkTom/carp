@@ -174,6 +174,45 @@ CMakeFiles/carp.dir/TSA/tsals.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/carp.dir/TSA/tsals.c.s"
 	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/hao/Documents/Projects/carp/TSA/tsals.c -o CMakeFiles/carp.dir/TSA/tsals.c.s
 
+CMakeFiles/carp.dir/LMA/LMA.c.o: CMakeFiles/carp.dir/flags.make
+CMakeFiles/carp.dir/LMA/LMA.c.o: ../LMA/LMA.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/hao/Documents/Projects/carp/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building C object CMakeFiles/carp.dir/LMA/LMA.c.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/carp.dir/LMA/LMA.c.o   -c /Users/hao/Documents/Projects/carp/LMA/LMA.c
+
+CMakeFiles/carp.dir/LMA/LMA.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/carp.dir/LMA/LMA.c.i"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/hao/Documents/Projects/carp/LMA/LMA.c > CMakeFiles/carp.dir/LMA/LMA.c.i
+
+CMakeFiles/carp.dir/LMA/LMA.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/carp.dir/LMA/LMA.c.s"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/hao/Documents/Projects/carp/LMA/LMA.c -o CMakeFiles/carp.dir/LMA/LMA.c.s
+
+CMakeFiles/carp.dir/MAENS/MAENS.c.o: CMakeFiles/carp.dir/flags.make
+CMakeFiles/carp.dir/MAENS/MAENS.c.o: ../MAENS/MAENS.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/hao/Documents/Projects/carp/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building C object CMakeFiles/carp.dir/MAENS/MAENS.c.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/carp.dir/MAENS/MAENS.c.o   -c /Users/hao/Documents/Projects/carp/MAENS/MAENS.c
+
+CMakeFiles/carp.dir/MAENS/MAENS.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/carp.dir/MAENS/MAENS.c.i"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/hao/Documents/Projects/carp/MAENS/MAENS.c > CMakeFiles/carp.dir/MAENS/MAENS.c.i
+
+CMakeFiles/carp.dir/MAENS/MAENS.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/carp.dir/MAENS/MAENS.c.s"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/hao/Documents/Projects/carp/MAENS/MAENS.c -o CMakeFiles/carp.dir/MAENS/MAENS.c.s
+
+CMakeFiles/carp.dir/MAENS/operators.c.o: CMakeFiles/carp.dir/flags.make
+CMakeFiles/carp.dir/MAENS/operators.c.o: ../MAENS/operators.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/hao/Documents/Projects/carp/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building C object CMakeFiles/carp.dir/MAENS/operators.c.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/carp.dir/MAENS/operators.c.o   -c /Users/hao/Documents/Projects/carp/MAENS/operators.c
+
+CMakeFiles/carp.dir/MAENS/operators.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/carp.dir/MAENS/operators.c.i"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/hao/Documents/Projects/carp/MAENS/operators.c > CMakeFiles/carp.dir/MAENS/operators.c.i
+
+CMakeFiles/carp.dir/MAENS/operators.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/carp.dir/MAENS/operators.c.s"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/hao/Documents/Projects/carp/MAENS/operators.c -o CMakeFiles/carp.dir/MAENS/operators.c.s
+
 # Object files for target carp
 carp_OBJECTS = \
 "CMakeFiles/carp.dir/main.c.o" \
@@ -184,7 +223,10 @@ carp_OBJECTS = \
 "CMakeFiles/carp.dir/readmap.c.o" \
 "CMakeFiles/carp.dir/dheuristic.c.o" \
 "CMakeFiles/carp.dir/TSA/TSA.c.o" \
-"CMakeFiles/carp.dir/TSA/tsals.c.o"
+"CMakeFiles/carp.dir/TSA/tsals.c.o" \
+"CMakeFiles/carp.dir/LMA/LMA.c.o" \
+"CMakeFiles/carp.dir/MAENS/MAENS.c.o" \
+"CMakeFiles/carp.dir/MAENS/operators.c.o"
 
 # External object files for target carp
 carp_EXTERNAL_OBJECTS =
@@ -198,9 +240,12 @@ carp: CMakeFiles/carp.dir/readmap.c.o
 carp: CMakeFiles/carp.dir/dheuristic.c.o
 carp: CMakeFiles/carp.dir/TSA/TSA.c.o
 carp: CMakeFiles/carp.dir/TSA/tsals.c.o
+carp: CMakeFiles/carp.dir/LMA/LMA.c.o
+carp: CMakeFiles/carp.dir/MAENS/MAENS.c.o
+carp: CMakeFiles/carp.dir/MAENS/operators.c.o
 carp: CMakeFiles/carp.dir/build.make
 carp: CMakeFiles/carp.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/hao/Documents/Projects/carp/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Linking C executable carp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/hao/Documents/Projects/carp/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Linking C executable carp"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/carp.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

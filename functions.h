@@ -86,6 +86,9 @@ void nextScenario(Individual *Solution, const Task *inst_tasks, const Arc *inst_
 
 
 
+
+int rand_choose(int num);
+
 int max(int *Array);
 
 void find_ele_positions(int *positions, int *a, int e);

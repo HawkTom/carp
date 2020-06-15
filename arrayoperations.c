@@ -6,6 +6,15 @@
 #include "functions.h"
 
 
+int rand_choose(int num)
+{
+    int k = rand()%num;
+
+    k++;
+
+    return k;
+}
+
 int max(int *Array)
 {
     int Length = Array[0];

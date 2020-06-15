@@ -76,6 +76,21 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/Users/hao/Documents/Projects/carp/LMA/LMA.c">
+			<Option target="carp"/>
+		</Unit>
+		<Unit filename="/Users/hao/Documents/Projects/carp/LMA/LMA.h">
+			<Option target="carp"/>
+		</Unit>
+		<Unit filename="/Users/hao/Documents/Projects/carp/MAENS/MAENS.c">
+			<Option target="carp"/>
+		</Unit>
+		<Unit filename="/Users/hao/Documents/Projects/carp/MAENS/MAENS.h">
+			<Option target="carp"/>
+		</Unit>
+		<Unit filename="/Users/hao/Documents/Projects/carp/MAENS/operators.c">
+			<Option target="carp"/>
+		</Unit>
 		<Unit filename="/Users/hao/Documents/Projects/carp/TSA/TSA.c">
 			<Option target="carp"/>
 		</Unit>

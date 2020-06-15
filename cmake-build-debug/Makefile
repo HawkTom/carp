@@ -123,6 +123,87 @@ carp/fast:
 	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/build
 .PHONY : carp/fast
 
+LMA/LMA.o: LMA/LMA.c.o
+
+.PHONY : LMA/LMA.o
+
+# target to build an object file
+LMA/LMA.c.o:
+	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/LMA/LMA.c.o
+.PHONY : LMA/LMA.c.o
+
+LMA/LMA.i: LMA/LMA.c.i
+
+.PHONY : LMA/LMA.i
+
+# target to preprocess a source file
+LMA/LMA.c.i:
+	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/LMA/LMA.c.i
+.PHONY : LMA/LMA.c.i
+
+LMA/LMA.s: LMA/LMA.c.s
+
+.PHONY : LMA/LMA.s
+
+# target to generate assembly for a file
+LMA/LMA.c.s:
+	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/LMA/LMA.c.s
+.PHONY : LMA/LMA.c.s
+
+MAENS/MAENS.o: MAENS/MAENS.c.o
+
+.PHONY : MAENS/MAENS.o
+
+# target to build an object file
+MAENS/MAENS.c.o:
+	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/MAENS/MAENS.c.o
+.PHONY : MAENS/MAENS.c.o
+
+MAENS/MAENS.i: MAENS/MAENS.c.i
+
+.PHONY : MAENS/MAENS.i
+
+# target to preprocess a source file
+MAENS/MAENS.c.i:
+	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/MAENS/MAENS.c.i
+.PHONY : MAENS/MAENS.c.i
+
+MAENS/MAENS.s: MAENS/MAENS.c.s
+
+.PHONY : MAENS/MAENS.s
+
+# target to generate assembly for a file
+MAENS/MAENS.c.s:
+	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/MAENS/MAENS.c.s
+.PHONY : MAENS/MAENS.c.s
+
+MAENS/operators.o: MAENS/operators.c.o
+
+.PHONY : MAENS/operators.o
+
+# target to build an object file
+MAENS/operators.c.o:
+	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/MAENS/operators.c.o
+.PHONY : MAENS/operators.c.o
+
+MAENS/operators.i: MAENS/operators.c.i
+
+.PHONY : MAENS/operators.i
+
+# target to preprocess a source file
+MAENS/operators.c.i:
+	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/MAENS/operators.c.i
+.PHONY : MAENS/operators.c.i
+
+MAENS/operators.s: MAENS/operators.c.s
+
+.PHONY : MAENS/operators.s
+
+# target to generate assembly for a file
+MAENS/operators.c.s:
+	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/MAENS/operators.c.s
+.PHONY : MAENS/operators.c.s
+
 TSA/TSA.o: TSA/TSA.c.o
 
 .PHONY : TSA/TSA.o
@@ -375,6 +456,15 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... carp"
+	@echo "... LMA/LMA.o"
+	@echo "... LMA/LMA.i"
+	@echo "... LMA/LMA.s"
+	@echo "... MAENS/MAENS.o"
+	@echo "... MAENS/MAENS.i"
+	@echo "... MAENS/MAENS.s"
+	@echo "... MAENS/operators.o"
+	@echo "... MAENS/operators.i"
+	@echo "... MAENS/operators.s"
 	@echo "... TSA/TSA.o"
 	@echo "... TSA/TSA.i"
 	@echo "... TSA/TSA.s"

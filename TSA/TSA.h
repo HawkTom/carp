@@ -16,6 +16,6 @@ int SWAP(Individual *BestSWAPNeighbor, Individual *CurrSolution, int *MovedTasks
                     double PenPrmt, double BestFitness, double BestFsbFitness);
 void RepairInfeasibility (Individual *Indi, Task *inst_tasks);
 
-void TSA(Task *inst_tasks);
+void TSA(const Task *inst_tasks);
 
 #endif //CARP_TSA_H
