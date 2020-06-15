@@ -112,5 +112,4 @@ void ReverseDirection(int *Array, int k1, int k2);
 
 
 
-
 #endif //CARP_FUNCTIONS_H

@@ -39,4 +39,7 @@ Array function:
 6. add_element(int *a, int e, int k):
     a[1:k-1] + e + a[k:end]
 
+7. FindTask(int a, int b, const Task *inst_tasks, int NO_Task)
+    find task [a, b] in inst_tasks;
+
 ```

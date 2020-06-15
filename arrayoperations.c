@@ -162,7 +162,7 @@ int FindTask(int a, int b, const Task *inst_tasks, int NO_Task)
 
     for (i = 1; i <= NO_Task; i++)
     {
-        if (inst_tasks[i].tail_node == a && inst_tasks[i].head_node == b)
+        if (inst_tasks[i].head_node == a && inst_tasks[i].tail_node == b)
             return i;
     }
 

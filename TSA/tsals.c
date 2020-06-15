@@ -124,6 +124,7 @@ int SingleInsertion(Individual *BestSINeighbor, Individual *CurrSolution, int *M
                         delete_element(Neighbor.Loads, i);
                     }
 
+
                     Neighbor.TotalCost = CurrSolution->TotalCost - min_cost[inst_tasks[Route[i][j-1]].tail_node][inst_tasks[Route[i][j]].head_node]
                             - min_cost[inst_tasks[Route[i][j]].tail_node][inst_tasks[Route[i][j+1]].head_node]
                             + min_cost[inst_tasks[Route[i][j-1]].tail_node][inst_tasks[Route[i][j+1]].head_node]
@@ -197,6 +198,7 @@ int SingleInsertion(Individual *BestSINeighbor, Individual *CurrSolution, int *M
             if (k == Besti)
             {
                 delete_element(Route[k], Bestj);
+
                 BestSINeighbor->Sequence[0] --; // Route[1] = 0
                 JoinArray(BestSINeighbor->Sequence, Route[k]);
             } else {
@@ -265,7 +267,7 @@ int DoubleInsertion(Individual *BestDINeighbor, Individual *CurrSolution, int *M
         if (Route[i][0] < 4)
             continue;
         RID1 = i;
-        for (j = 2; i < Route[i][0]-1; i++) // Route[i]: 0, t1, t2, t3, ..., tn, 0
+        for (j = 2; j < Route[i][0]-1; j++) // Route[i]: 0, t1, t2, t3, ..., tn, 0
         {
             for (u = 0; u < Positions[0]; u++)
             {
@@ -296,6 +298,7 @@ int DoubleInsertion(Individual *BestDINeighbor, Individual *CurrSolution, int *M
                     {
                         Neighbor.TotalVioLoad += (Neighbor.Loads[Neighbor.Loads[0]] -capacity);
                     }
+
                     Neighbor.TotalCost = CurrSolution->TotalCost - min_cost[inst_tasks[Route[i][j-1]].tail_node][inst_tasks[Route[i][j]].head_node]
                                                                  - min_cost[inst_tasks[Route[i][j+1]].tail_node][inst_tasks[Route[i][j+2]].head_node]
                                                                  + min_cost[inst_tasks[Route[i][j-1]].tail_node][inst_tasks[Route[i][j+2]].head_node]
@@ -347,12 +350,12 @@ int DoubleInsertion(Individual *BestDINeighbor, Individual *CurrSolution, int *M
                         Neighbor.TotalVioLoad -= (Neighbor.Loads[i] - capacity + inst_tasks[Route[i][j]].demand + inst_tasks[Route[i][j+1]].demand);
                     }
 
-                    if (Neighbor.Loads[i] > capacity + (inst_tasks[Route[i][j]].demand + inst_tasks[Route[i][j+1]].demand))
+                    if (Neighbor.Loads[u] > capacity + (inst_tasks[Route[i][j]].demand + inst_tasks[Route[i][j+1]].demand))
                     {
                         Neighbor.TotalVioLoad += inst_tasks[Route[i][j]].demand + inst_tasks[Route[i][j+1]].demand;
-                    } else if (Neighbor.Loads[i] > capacity)
+                    } else if (Neighbor.Loads[u] > capacity)
                     {
-                        Neighbor.TotalVioLoad += (capacity - Neighbor.Loads[i]);
+                        Neighbor.TotalVioLoad += (Neighbor.Loads[u] - capacity);
                     }
                     if (Neighbor.Loads[i] == 0)
                     {
@@ -766,7 +769,335 @@ int SWAP(Individual *BestSWAPNeighbor, Individual *CurrSolution, int *MovedTasks
 
 }
 
+void RepairInfeasibility (Individual *Indi, Task *inst_tasks)
+{
+    int NRE = req_edge_num, NRA = req_arc_num;
+    int i, j, k, RoutesNum;
+    int NodeRoutes[50][250], TaskRoutes[50][250];
+    int InRoutes[NRE+NRA + 1][50], CheckMark[NRE+NRA+1];
+    int NO_Task = 2*NRE + NRA;
 
+    // TaskRoutes: each row is the task sequence of each sub-route
+    // RoutesNum: the number of routes
+    RoutesNum = 0;
+    for (i = 1; i < Indi->Sequence[0]; i++)
+    {
+        if (Indi->Sequence[i] == 0)
+        {
+            TaskRoutes[RoutesNum][0]++;
+            TaskRoutes[RoutesNum][TaskRoutes[RoutesNum][0]] = 0;
+            RoutesNum ++;
+            TaskRoutes[RoutesNum][0] = 1;
+            TaskRoutes[RoutesNum][1] = 0;
+        } else{
+            TaskRoutes[RoutesNum][0] ++;
+            TaskRoutes[RoutesNum][TaskRoutes[RoutesNum][0]] = Indi->Sequence[i];
+        }
+    }
+    TaskRoutes[RoutesNum][0]++;
+    TaskRoutes[RoutesNum][TaskRoutes[RoutesNum][0]] = 0;
+
+    // NodeRoutes: each row is the actual node sequence of each sub-route
+    for (i = 1; i <= RoutesNum; i++)
+    {
+        NodeRoutes[i][0] = 0;
+        for (j = 1; j < TaskRoutes[i][0]; j++)
+        {
+            for (k = 1; k <= shortest_path[inst_tasks[TaskRoutes[i][j]].tail_node][inst_tasks[TaskRoutes[i][j+1]].head_node][0]; k++)
+            {
+                NodeRoutes[i][0] ++;
+                NodeRoutes[i][NodeRoutes[i][0]] = shortest_path[inst_tasks[TaskRoutes[i][j]].tail_node][inst_tasks[TaskRoutes[i][j+1]].head_node][k];
+            }
+        }
+    }
+
+    // InRoutes: the row TID save all routes ID where task TID located
+    // e.g. InRoutes[1] = {1, 2, 3}, task 1 exists in route 1, 2, 3.
+    for (i = 1; i <= NRE+NRA; i++)
+    {
+        InRoutes[i][0] = 0;
+    }
+    for (i=1; i<=RoutesNum; i++)
+    {
+        memset(CheckMark, 0, sizeof(CheckMark));
+        for (j=1; j < NodeRoutes[i][0]; j++)
+        {
+            int TID = FindTask(NodeRoutes[i][j], NodeRoutes[i][j+1], inst_tasks, NO_Task);
+            if (TID > NRE)
+                TID -= NRE;
+            if (TID == 0) // if TID==0, it is not a task
+                continue;
+
+            if (!CheckMark[TID])
+            {
+                CheckMark[TID] = 1;
+                InRoutes[TID][0] ++;
+                InRoutes[TID][InRoutes[TID][0]] = i;
+            }
+        }
+    }
+
+    // FreeTasks: tasks that exists in over one routes
+    // tasks only exist in one route is ignored because it can't be assigned into different routes.
+    int FreeTasks[NRE + NRA + 1];
+    FreeTasks[0] = 0;
+    for (i = 1; i <= NRE + NRA; i++)
+    {
+        if (InRoutes[i][0] == 1) // tasks only exist in one route;
+            continue;
+        FreeTasks[0] ++;
+        FreeTasks[FreeTasks[0]] = i;
+    }
+
+
+    struct TaskAssignment
+    {
+        int Assignment[300]; // which route is assigned for each task.
+        int Loads[50];
+        int TotalVioLoad;
+    };
+
+    struct TaskAssignment CurrTA, NeighTA, NextTA, BestTA;
+
+    memset(CurrTA.Assignment, 0, sizeof(CurrTA.Assignment));
+    memset(CurrTA.Loads, 0, sizeof(CurrTA.Loads));
+    CurrTA.Loads[0] = RoutesNum;
+
+    for (i = 1; i <= NRE + NRA; i++)
+    {
+        if (InRoutes[i][0] == 1)
+        {
+            CurrTA.Assignment[i] = InRoutes[i][1];
+            CurrTA.Loads[InRoutes[i][1]] += inst_tasks[i].demand;
+        }
+    }
+
+    int LeftTasks[NRE+NRA+1], RouteCandDemands[RoutesNum+1], CandRoutes[NRE+NRA+1][50];
+    AssignArray(FreeTasks, LeftTasks);
+    memset(RouteCandDemands, 0, sizeof(RouteCandDemands));
+    for(i = 1; i <= NRE+NRA; i++)
+    {
+        CandRoutes[i][0] = 0; // The routes which task i can be assigned.
+        for (j = 1; j <= InRoutes[i][0]; j++)
+        {
+            if (CurrTA.Loads[InRoutes[i][j]] >= capacity)
+                continue;
+
+            CandRoutes[i][0] ++;
+            CandRoutes[i][CandRoutes[i][0]] = InRoutes[i][j];
+        }
+    }
+
+    // RouteCandDemands[i] denotes Route[i].
+    // The value of RouteCandDemands[i] represents the total demand of all possible assigned tasks.
+    for (i = 1; i <= LeftTasks[0]; i++)
+    {
+        for (j = 1; j <= InRoutes[LeftTasks[i]][0]; j++)
+        {
+            RouteCandDemands[InRoutes[LeftTasks[i]][j]] += inst_tasks[LeftTasks[i]].demand;
+        }
+    }
+
+    int SelID, AssignedRouteID;
+    int n;
+    for (n = 1; n <= FreeTasks[0]; n++)
+    {
+        SelID = 0; // select item
+        for (i = 1; i <= LeftTasks[0]; i++)
+        {
+            if (SelID == 0)
+            {
+                SelID = i;
+            } else if (CandRoutes[LeftTasks[i]][0] < CandRoutes[LeftTasks[SelID]][0]) // select smallest _|^|_
+            {
+                SelID = i;
+            } else if (CandRoutes[LeftTasks[i]][0] == CandRoutes[LeftTasks[SelID]][0])
+            {
+                if (inst_tasks[LeftTasks[i]].demand > inst_tasks[LeftTasks[SelID]].demand) // select the max demand
+                {
+                    SelID = i;
+                }
+            }
+        }
+
+        AssignedRouteID = 0; // select bin
+        for (i = 1; i <= InRoutes[LeftTasks[SelID]][0]; i++)
+        {
+            if (AssignedRouteID == 0)
+            {
+                AssignedRouteID = i;
+            }
+            else if (CurrTA.Loads[InRoutes[LeftTasks[SelID]][i]]+inst_tasks[LeftTasks[SelID]].demand <
+                     CurrTA.Loads[InRoutes[LeftTasks[SelID]][AssignedRouteID]]+inst_tasks[LeftTasks[SelID]].demand)
+            {
+                AssignedRouteID = i;
+            }
+            else if (CurrTA.Loads[InRoutes[LeftTasks[SelID]][i]]+inst_tasks[LeftTasks[SelID]].demand ==
+                     CurrTA.Loads[InRoutes[LeftTasks[SelID]][AssignedRouteID]]+inst_tasks[LeftTasks[SelID]].demand)
+            {
+                if (RouteCandDemands[InRoutes[LeftTasks[SelID]][i]]+CurrTA.Loads[InRoutes[LeftTasks[SelID]][i]] >
+                    RouteCandDemands[InRoutes[LeftTasks[SelID]][AssignedRouteID]]+
+                    CurrTA.Loads[InRoutes[LeftTasks[SelID]][AssignedRouteID]])
+                {
+                    AssignedRouteID = i;
+                }
+            }
+        }
+
+        CurrTA.Assignment[LeftTasks[SelID]] = InRoutes[LeftTasks[SelID]][AssignedRouteID];
+        CurrTA.Loads[CurrTA.Assignment[LeftTasks[SelID]]] += inst_tasks[LeftTasks[SelID]].demand;
+        for (i = 1; i <= InRoutes[LeftTasks[SelID]][0]; i++)
+        {
+            RouteCandDemands[InRoutes[LeftTasks[SelID]][i]] -= inst_tasks[LeftTasks[SelID]].demand;
+        }
+
+        if (CurrTA.Loads[CurrTA.Assignment[LeftTasks[SelID]]] >= capacity)
+        {
+            for (i = 1; i <= NRE+NRA; i++)
+            {
+                for (j = 1; j <= CandRoutes[i][0]; j++)
+                {
+                    if (CandRoutes[i][j] == CurrTA.Assignment[LeftTasks[SelID]])
+                    {
+                        delete_element(CandRoutes[i], j);
+                        break;
+                    }
+                }
+            }
+        }
+        delete_element(LeftTasks, SelID);
+    }
+    CurrTA.TotalVioLoad = 0;
+    for (i = 1; i <= RoutesNum; i++)
+    {
+        if (CurrTA.Loads[i] > capacity)
+            CurrTA.TotalVioLoad += CurrTA.Loads[i]-capacity;
+    }
+
+    BestTA = CurrTA;
+
+    // tabu search for repairing
+    int TabuList[NRE+NRA+1];
+    int TabuTenure = FreeTasks[0]/2;
+    int TabuTask, Tabu;
+    memset(TabuList, 0, sizeof(TabuList));
+
+    int count = 0;
+    int stlcount = 0;
+    while (BestTA.TotalVioLoad > 0)
+    {
+        count ++;
+        stlcount ++;
+        NextTA.TotalVioLoad = INF;
+        for (i = 1; i <= FreeTasks[0]; i++)
+        {
+            for (j = 1; j <= InRoutes[FreeTasks[i]][0]; j++)
+            {
+                if (InRoutes[FreeTasks[i]][j] == CurrTA.Assignment[FreeTasks[i]])
+                    continue;
+
+                NeighTA = CurrTA;
+                NeighTA.Assignment[FreeTasks[i]] = InRoutes[FreeTasks[i]][j];
+                NeighTA.Loads[CurrTA.Assignment[FreeTasks[i]]] -= inst_tasks[FreeTasks[i]].demand;
+                NeighTA.Loads[NeighTA.Assignment[FreeTasks[i]]] += inst_tasks[FreeTasks[i]].demand;
+
+                if (CurrTA.Loads[NeighTA.Assignment[FreeTasks[i]]] >= capacity)
+                {
+                    NeighTA.TotalVioLoad += inst_tasks[FreeTasks[i]].demand;
+                }
+                else if (NeighTA.Loads[NeighTA.Assignment[FreeTasks[i]]] > capacity)
+                {
+                    NeighTA.TotalVioLoad += NeighTA.Loads[NeighTA.Assignment[FreeTasks[i]]]-capacity;
+                }
+
+                if (NeighTA.Loads[CurrTA.Assignment[FreeTasks[i]]] >= capacity)
+                {
+                    NeighTA.TotalVioLoad -= inst_tasks[FreeTasks[i]].demand;
+                }
+                else if (CurrTA.Loads[CurrTA.Assignment[FreeTasks[i]]] > capacity)
+                {
+                    NeighTA.TotalVioLoad -= CurrTA.Loads[CurrTA.Assignment[FreeTasks[i]]]-capacity;
+                }
+
+                Tabu = 0;
+                if (TabuList[FreeTasks[i]] > 0 && NeighTA.TotalVioLoad >= BestTA.TotalVioLoad)
+                    Tabu = 1;
+
+                if (Tabu)
+                    continue;
+
+                if (NeighTA.TotalVioLoad < NextTA.TotalVioLoad)
+                {
+                    NextTA = NeighTA;
+                    TabuTask = FreeTasks[i];
+                }
+            }
+        }
+        for (i = 1; i <= NRE + NRA; i++)
+        {
+            if (TabuList[i] > 0)
+                TabuList[i] --;
+        }
+
+        TabuList[TabuTask] = TabuTenure;
+        CurrTA = NextTA;
+        if (CurrTA.TotalVioLoad < BestTA.TotalVioLoad)
+        {
+            stlcount = 0;
+            BestTA = CurrTA;
+        }
+
+        if (count == 2*(NRA+NRA) || stlcount == (NRE + NRA) / 2)
+            break;
+    }
+    if (BestTA.TotalVioLoad > Indi->TotalVioLoad)
+        return;
+
+    int Served[NRA + NRE + 1];
+    memset(Served, 0, sizeof(Served));
+
+    Indi->Sequence[0] = 1;
+    Indi->Sequence[1] = 0;
+
+    for (i=1; i <= RoutesNum; i++)
+    {
+        for (j = 1; j < NodeRoutes[i][0]; j++)
+        {
+            int TID = FindTask(NodeRoutes[i][j], NodeRoutes[i][j+1], inst_tasks, NO_Task);
+            int TmpTID = TID;
+
+            if (TmpTID > NRE)
+                TmpTID -= NRE;
+
+            if (TmpTID == 0)
+                continue;
+
+            if (BestTA.Assignment[TmpTID] == i && !Served[TmpTID])
+            {
+                Served[TmpTID] = 1;
+                Indi->Sequence[0] ++;
+                Indi->Sequence[Indi->Sequence[0]] = TID;
+            }
+
+        }
+        if (Indi->Sequence[Indi->Sequence[0]] != 0)
+        {
+            Indi->Sequence[0] ++;
+            Indi->Sequence[Indi->Sequence[0]] = 0;
+        }
+    }
+
+    for(i = BestTA.Loads[0]; i > 0; i--)
+    {
+        if (BestTA.Loads[i] == 0)
+            delete_element(BestTA.Loads, i);
+    }
+
+    Indi->TotalCost = get_task_seq_total_cost(Indi->Sequence, inst_tasks);
+    AssignArray(BestTA.Loads, Indi->Loads);
+    Indi->TotalVioLoad = BestTA.TotalVioLoad;
+
+}
 
 
 

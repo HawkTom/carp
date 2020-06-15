@@ -44,7 +44,7 @@ void executeSolution(Individual *Solution, const Task *inst_tasks)
         {
             currTask = Solution->Sequence[j];
 
-            currNode = inst_tasks[currTask].head_node;
+            currNode = inst_tasks[currTask].head_node; // 这里有问题 没有考虑 task 与 task 之间的路程
             dis += min_cost[start][currNode];
             if (dis > tau)
                 break;
