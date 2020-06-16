@@ -64,7 +64,58 @@ void MAENS(Task *inst_tasks)
 
     // main loop
 
+    int ite, wite;
+    Individual parent1, parent2, xed_child, mted_child, child;
+
+    int offsize = 6*popsize;
+    int totalsize = popsize + offsize;
+
+    ite = 0;
+    wite = 0;
+    while (ite < M_ite)
+    {
+        ite ++;
+        wite ++;
+
+        int ptr = popsize;
+        while (ptr < totalsize)
+        {
+            child.TotalCost = 0;
+
+            // randomly select two parents
+            int par_id1, par_id2;
+            rand_selection(&par_id1, &par_id2, popsize);
+            parent1 = pop[par_id1];
+            parent2 = pop[par_id2];
+
+            // crossover
+
+
+
+
+        }
+
+
+
+    }
+
 
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

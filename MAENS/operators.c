@@ -117,3 +117,167 @@ void indi_copy(Individual *target, Individual *source)
 //    memcpy(target->pred, source->pred, sizeof(source->pred));
 //    memcpy(target->succ, source->succ, sizeof(source->succ));
 }
+
+void SBX(Individual *xed_child, Individual *p1, Individual *p2, const Task *inst_tasks)
+// the SBX crossover operator
+{
+    /*
+     * P1 -> R1, P2 -> R2
+     * R1 -> {R11, R12}, R2 -> {R21, R22}
+     * NewR = {R11, R22}
+     * remove duplicate task in NewR and insert missing task to NewR -> offspring
+     */
+
+    int i, j, k;
+    int SubPath1[MAX_TASK_SEQ_LENGTH], SubPath2[MAX_TASK_SEQ_LENGTH];
+    int Routes1[50][MAX_TASK_SEQ_LENGTH], Routes2[50][MAX_TASK_SEQ_LENGTH];
+    int XCLds[50], LeftTasks[MAX_TASK_SEQ_LENGTH], Positions[50];
+
+    struct CandSelection
+    {
+        int RouteID;
+        int Pos;
+    };
+
+    // CandSLCTList record which routes and the postion of each task located
+    struct CandSelection CandSLCTList1[MAX_TASK_SEQ_LENGTH], CandSLCTList2[MAX_TASK_SEQ_LENGTH];
+    int LLength1 = 0, LLength2 = 0;
+
+    find_ele_positions(Positions, p1->Sequence, 0);
+    Routes1[0][0] = Positions[0] - 1;
+    for (i=1; i < Positions[0]; i++)
+    {
+        AssignSubArray(p1->Sequence, Positions[i], Positions[i+1], Routes1[i]);
+    }
+
+    find_ele_positions(Positions, p2->Sequence, 0);
+    Routes2[0][0] = Positions[0] - 1;
+    for (i=1; i < Positions[0]; i++)
+    {
+        AssignSubArray(p2->Sequence, Positions[i], Positions[i+1], Routes2[i]);
+    }
+
+    memcpy(XCLds, p1->Loads, sizeof(p1->Loads));
+
+    for (i=1; i <= Routes1[0][0]; i++)
+    {
+        for (j = 2; j < Routes1[i][0]; j++)
+        {
+            LLength1 ++;
+            CandSLCTList1[LLength1].RouteID = i;
+            CandSLCTList1[LLength1].Pos = j;
+        }
+    }
+
+    for (i=1; i <= Routes2[0][0]; i++)
+    {
+        for (j = 2; j < Routes2[i][0]; j++)
+        {
+            LLength2 ++;
+            CandSLCTList2[LLength2].RouteID = i;
+            CandSLCTList2[LLength2].Pos = j;
+        }
+    }
+
+    int k1 = rand_choose(LLength1);
+    int k2 = rand_choose(LLength2);
+
+    AssignSubArray(Routes1[CandSLCTList1[k1].RouteID], 1, CandSLCTList1[k1].Pos, SubPath1);
+    AssignSubArray(Routes2[CandSLCTList2[k2].RouteID], CandSLCTList2[k2].Pos,Routes2[CandSLCTList2[k2].RouteID][0], SubPath2);
+    AssignSubArray(Routes1[CandSLCTList1[k1].RouteID], CandSLCTList1[k1].Pos+1,Routes1[CandSLCTList1[k1].RouteID][0]-1, LeftTasks);
+
+    // remove duplicated tasks for Route1
+    int Checked[MAX_TASK_SEQ_LENGTH];
+    memset(Checked, 0, sizeof(Checked));
+
+    for (i = 1; i < SubPath2[0]; i++)
+    {
+        if (Checked[i])
+            continue;
+
+        for (j = SubPath1[0]; j > 1; j--)
+        {
+            if (SubPath1[j] == SubPath2[i] || SubPath1[j] == inst_tasks[SubPath2[i]].inverse)
+            {
+                delete_element(SubPath1, j);
+                Checked[i] = 1;
+                break;
+            }
+        }
+    }
+
+    for (i = 1; i < SubPath2[0]; i++)
+    {
+        if (Checked[i])
+            continue;
+
+        for (j = LeftTasks[0]; j > 0; j--)
+        {
+            if (LeftTasks[j] == SubPath2[i] || LeftTasks[j] == inst_tasks[SubPath2[i]].inverse)
+            {
+                delete_element(LeftTasks, j);
+                Checked[i] = 1;
+                break;
+            }
+        }
+    }
+
+    for (i = 1; i <= SubPath2[0]; i ++)
+    {
+        if (Checked[i])
+            continue;
+
+        for (j=1; j <= Routes1[0][0]; j++)
+        {
+            if (j == CandSLCTList1[k1].RouteID)
+                continue;
+
+            for (k = Routes1[j][0]; k > 1; k --)
+            {
+                if (Routes1[j][k] == SubPath2[i] || Routes1[j][k] == inst_tasks[SubPath2[i]].inverse)
+                {
+                    delete_element(Routes1[j], k);
+                    XCLds[j] -= inst_tasks[SubPath2[i]].demand;
+                    Checked[i] = 1;
+                }
+            }
+            if (Checked[i])
+                break;
+        }
+    }
+
+    JoinArray(SubPath1, SubPath2);
+    memcpy(Routes1[CandSLCTList1[k1].RouteID], SubPath1, sizeof(SubPath1));
+    XCLds[CandSLCTList1[k1].RouteID] = 0;
+    for (i = 2; i < Routes1[CandSLCTList1[k1].RouteID][0]; i++)
+    {
+        XCLds[CandSLCTList1[k1].RouteID] += inst_tasks[Routes1[CandSLCTList1[k1].RouteID][i]].demand;
+    }
+
+    int NO_LeftTasks = LeftTasks[0];
+
+    // insert missing tasks
+
+
+
+
+}
+
+void rand_selection(int *id1, int *id2, int popsize)
+/* pop has been sorted increasingly already */
+{
+int k1, k2;
+int candi[MAX_POPSIZE+1];
+candi[0] = popsize;
+for (int i = 1; i <= popsize; i++)
+{
+candi[i] = i-1;
+}
+
+k1 = rand_choose(candi[0]);
+*id1 = candi[k1];
+delete_element(candi, k1);
+k2 = rand_choose(candi[0]);
+*id2 = candi[k2];
+//printf("id1 = %d, id2 = %d, popsize = %d\n", id1, id2, popsize);
+}

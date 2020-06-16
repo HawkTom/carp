@@ -25,5 +25,6 @@ void MAENS(Task *inst_tasks);
 
 void rand_scanning(Individual *rs_indi, const Task *inst_tasks, const int *serve_mark);
 void indi_copy(Individual *target, Individual *source);
+void rand_selection(int *id1, int *id2, int popsize);
 
 #endif //CARP_MAENS_H
