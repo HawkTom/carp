@@ -89,6 +89,38 @@ void MAENS(Task *inst_tasks)
             parent2 = pop[par_id2];
 
             // crossover
+            SBX(&xed_child, &parent1, &parent2, inst_tasks);
+            if (xed_child.TotalVioLoad == 0 && xed_child.TotalCost < best_fsb_solution.TotalCost)
+            {
+                best_fsb_solution = xed_child;
+                wite = 0;
+            }
+
+            used = 0;
+            for (i = 0; i < ptr; i++)
+            {
+                if (i == par_id1 || i == par_id2)
+                    continue;
+
+                if (xed_child.TotalCost == pop[i].TotalCost && xed_child.TotalVioLoad == pop[i].TotalVioLoad)
+                {
+                    used = 1;
+                    break;
+                }
+            }
+
+            if (!used)
+            {
+                child = xed_child;
+            }
+
+            // Local Search with Probability
+            double random = 1.0 * rand() / RAND_MAX;
+            if (random < M_PROB)
+            {
+                // do the local search.
+            }
+
 
 
 

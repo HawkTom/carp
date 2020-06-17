@@ -4,6 +4,8 @@
 
 #include "MAENS.h"
 
+int task_routes[50][MAX_TASK_SEG_LENGTH];
+
 void rand_scanning(Individual *rs_indi, const Task *inst_tasks, const int *serve_mark)
 {
     int i, k;
@@ -257,27 +259,1004 @@ void SBX(Individual *xed_child, Individual *p1, Individual *p2, const Task *inst
     int NO_LeftTasks = LeftTasks[0];
 
     // insert missing tasks
+    struct Insert{
+        int InsertedTask;
+        int InsertRouteID;
+        int InsertPos;
+        int InsertCost;
+        int InsertVioLoad;
+    };
+
+    struct Insert CandInsertions[6000];
+    int NO_CandInsertions;
+    int IVLoad;
 
 
+    struct Insert ParetoSetInsertions[6000];
+    int ParetoSetSize;
+    int Out[6000], Add;
 
+    struct Insert BestInsertion;
+
+    int NO_CurrRoutes = 0;
+    for (j = 1; j <= Routes1[0][0]; j++)
+    {
+        if (Routes1[j][0] == 2)
+            continue;
+
+        NO_CurrRoutes ++;
+    }
+
+    int n, m, l, w;
+    int CurrTask;
+    for (n = 1; n <= NO_LeftTasks; n++)
+    {
+        NO_CandInsertions = 0;
+        ParetoSetSize = 0;
+
+        for (j = 1; j <= Routes1[0][0]; j++)
+        {
+            if (Routes1[j][0] == 2)
+                continue;
+
+            CurrTask = LeftTasks[n];
+            if (XCLds[j] > capacity)
+            {
+                IVLoad = inst_tasks[CurrTask].demand;
+            } else if (XCLds[j] > (capacity - inst_tasks[CurrTask].demand)) {
+                IVLoad = XCLds[j] + inst_tasks[CurrTask].demand - capacity;
+            } else {
+                IVLoad = 0;
+            }
+
+            for (k = 2; k <= Routes1[j][0]; k++)
+            {
+                NO_CandInsertions ++;
+                CandInsertions[NO_CandInsertions].InsertedTask = CurrTask;
+                CandInsertions[NO_CandInsertions].InsertRouteID = j;
+                CandInsertions[NO_CandInsertions].InsertPos = k;
+                CandInsertions[NO_CandInsertions].InsertCost = min_cost[inst_tasks[Routes1[j][k-1]].tail_node][inst_tasks[CurrTask].head_node] +
+                        min_cost[inst_tasks[CurrTask].tail_node][inst_tasks[Routes1[j][k]].head_node] -
+                        min_cost[inst_tasks[Routes1[j][k-1]].tail_node][inst_tasks[Routes1[j][k]].head_node];
+
+                CandInsertions[NO_CandInsertions].InsertVioLoad = IVLoad;
+
+                Out[0] = 0;
+                Add = 1;
+
+                for (m = 1; m <= ParetoSetSize; m++)
+                {
+                    if (CandInsertions[NO_CandInsertions].InsertCost > ParetoSetInsertions[m].InsertCost &&
+                            CandInsertions[NO_CandInsertions].InsertVioLoad > ParetoSetInsertions[m].InsertVioLoad)
+                    {
+                        Add = 0;
+                        break;
+                    } else if (CandInsertions[NO_CandInsertions].InsertCost < ParetoSetInsertions[m].InsertCost &&
+                               CandInsertions[NO_CandInsertions].InsertVioLoad < ParetoSetInsertions[m].InsertVioLoad)
+                    {
+                        Out[0] ++;
+                        Out[Out[0]] = m;
+                    }
+                }
+
+                if (Add)
+                {
+                    for ( m = Out[0]; m > 0; m--)
+                    {
+                        for (l = Out[m]; l < ParetoSetSize; l++)
+                        {
+                            ParetoSetInsertions[l] = ParetoSetInsertions[l + 1];
+                        }
+                        ParetoSetSize --;
+                    }
+
+                    ParetoSetSize ++;
+                    ParetoSetInsertions[ParetoSetSize] = CandInsertions[NO_CandInsertions];
+                }
+
+                w = inst_tasks[CurrTask].inverse;
+                NO_CandInsertions ++;
+                CandInsertions[NO_CandInsertions].InsertedTask = w;
+                CandInsertions[NO_CandInsertions].InsertRouteID = j;
+                CandInsertions[NO_CandInsertions].InsertPos = k;
+                CandInsertions[NO_CandInsertions].InsertCost = min_cost[inst_tasks[Routes1[j][k-1]].tail_node][inst_tasks[CurrTask].head_node] +
+                                                               min_cost[inst_tasks[w].tail_node][inst_tasks[Routes1[j][k]].head_node] -
+                                                               min_cost[inst_tasks[Routes1[j][k-1]].tail_node][inst_tasks[Routes1[j][k]].head_node];
+
+                CandInsertions[NO_CandInsertions].InsertVioLoad = IVLoad;
+
+                Out[0] = 0;
+                Add = 1;
+
+                for (m = 1; m <= ParetoSetSize; m++)
+                {
+                    if (CandInsertions[NO_CandInsertions].InsertCost > ParetoSetInsertions[m].InsertCost &&
+                        CandInsertions[NO_CandInsertions].InsertVioLoad > ParetoSetInsertions[m].InsertVioLoad)
+                    {
+                        Add = 0;
+                        break;
+                    } else if (CandInsertions[NO_CandInsertions].InsertCost < ParetoSetInsertions[m].InsertCost &&
+                               CandInsertions[NO_CandInsertions].InsertVioLoad < ParetoSetInsertions[m].InsertVioLoad)
+                    {
+                        Out[0] ++;
+                        Out[Out[0]] = m;
+                    }
+                }
+
+                if (Add)
+                {
+                    for ( m = Out[0]; m > 0; m--)
+                    {
+                        for (l = Out[m]; l < ParetoSetSize; l++)
+                        {
+                            ParetoSetInsertions[l] = ParetoSetInsertions[l + 1];
+                        }
+                        ParetoSetSize --;
+                    }
+
+                    ParetoSetSize ++;
+                    ParetoSetInsertions[ParetoSetSize] = CandInsertions[NO_CandInsertions];
+                }
+            }
+        }
+
+        // insert as a new route;
+
+        NO_CandInsertions ++;
+        CandInsertions[NO_CandInsertions].InsertedTask = CurrTask;
+        CandInsertions[NO_CandInsertions].InsertRouteID = 0;
+        CandInsertions[NO_CandInsertions].InsertPos = 2;
+        CandInsertions[NO_CandInsertions].InsertCost = min_cost[DEPOT][inst_tasks[CurrTask].head_node] + min_cost[inst_tasks[CurrTask].tail_node][DEPOT];
+        CandInsertions[NO_CandInsertions].InsertVioLoad = 0;
+
+        Out[0] = 0;
+        Add = 1;
+
+        for (m = 1; m <= ParetoSetSize; m++)
+        {
+            if (CandInsertions[NO_CandInsertions].InsertCost > ParetoSetInsertions[m].InsertCost &&
+                CandInsertions[NO_CandInsertions].InsertVioLoad > ParetoSetInsertions[m].InsertVioLoad)
+            {
+                Add = 0;
+                break;
+            } else if (CandInsertions[NO_CandInsertions].InsertCost < ParetoSetInsertions[m].InsertCost &&
+                       CandInsertions[NO_CandInsertions].InsertVioLoad < ParetoSetInsertions[m].InsertVioLoad)
+            {
+                Out[0] ++;
+                Out[Out[0]] = m;
+            }
+        }
+
+        if (Add)
+        {
+            for ( m = Out[0]; m > 0; m--)
+            {
+                for (l = Out[m]; l < ParetoSetSize; l++)
+                {
+                    ParetoSetInsertions[l] = ParetoSetInsertions[l + 1];
+                }
+                ParetoSetSize --;
+            }
+
+            ParetoSetSize ++;
+            ParetoSetInsertions[ParetoSetSize] = CandInsertions[NO_CandInsertions];
+        }
+
+        k = rand_choose(ParetoSetSize);
+        BestInsertion = ParetoSetInsertions[k];
+        if (BestInsertion.InsertRouteID == 0)
+        {
+            Routes1[0][0] ++;
+            Routes1[Routes1[0][0]][0] = 3;
+            Routes1[Routes1[0][0]][1] = 0;
+            Routes1[Routes1[0][0]][0] = BestInsertion.InsertedTask;
+            Routes1[Routes1[0][0]][3] = 0;
+
+            XCLds[0] ++;
+            XCLds[XCLds[0]] = inst_tasks[BestInsertion.InsertedTask].demand;
+        } else {
+            add_element(Routes1[BestInsertion.InsertRouteID], BestInsertion.InsertedTask, BestInsertion.InsertPos);
+            XCLds[BestInsertion.InsertRouteID] += inst_tasks[BestInsertion.InsertedTask].demand;
+        }
+    }
+
+
+    // transfer Routes1 to sequence
+    xed_child->Sequence[0] = 1;
+    for (i = 1; i <= Routes1[0][0]; i++)
+    {
+        if (Routes1[i][0] == 2)
+            continue;
+
+        xed_child->Sequence[0] --;
+        JoinArray(xed_child->Sequence, Routes1[i]);
+    }
+
+    xed_child->TotalCost = get_task_seq_total_cost(xed_child->Sequence, inst_tasks);
+    memcpy(xed_child->Loads, XCLds, sizeof(XCLds));
+
+    for (i = xed_child->Loads[0]; i > 0; i --)
+    {
+        if (xed_child->Loads[i] == 0)
+            delete_element(xed_child->Loads, i);
+    }
+    xed_child->TotalVioLoad = get_total_vio_load(xed_child->Loads);
 
 }
 
 void rand_selection(int *id1, int *id2, int popsize)
 /* pop has been sorted increasingly already */
 {
-int k1, k2;
-int candi[MAX_POPSIZE+1];
-candi[0] = popsize;
-for (int i = 1; i <= popsize; i++)
-{
-candi[i] = i-1;
+    int k1, k2;
+    int candi[MAX_POPSIZE+1];
+    candi[0] = popsize;
+    for (int i = 1; i <= popsize; i++)
+    {
+    candi[i] = i-1;
+    }
+
+    k1 = rand_choose(candi[0]);
+    *id1 = candi[k1];
+    delete_element(candi, k1);
+    k2 = rand_choose(candi[0]);
+    *id2 = candi[k2];
+    //printf("id1 = %d, id2 = %d, popsize = %d\n", id1, id2, popsize);
 }
 
-k1 = rand_choose(candi[0]);
-*id1 = candi[k1];
-delete_element(candi, k1);
-k2 = rand_choose(candi[0]);
-*id2 = candi[k2];
-//printf("id1 = %d, id2 = %d, popsize = %d\n", id1, id2, popsize);
+
+void lns_mut(Individual *c, Individual *p, Individual *best_fsb_solution, Task *inst_tasks)
+{
+    indi_copy(c, p);
+    double coef = 1.0*best_fsb_solution->TotalCost/capacity*(1.0*best_fsb_solution->TotalCost/p->TotalCost+1.0*p->TotalVioLoad/capacity+1.0);
+    c->Fitness = c->TotalCost + coef * c->TotalVioLoad;
+
+    int count = 0;
+    int count_fsb = 0, count_infsb = 0;
+
+    int imp = 1; // improved
+    while (imp)
+    {
+        count ++;
+        imp = 0;
+
+        if (c->TotalVioLoad == 0)
+        {
+            count_fsb ++;
+        } else {
+            count_infsb ++;
+        }
+
+        if (count % 5 == 0)
+        {
+            if (count_fsb == 5)
+            {
+                coef /= 5;
+                c->Fitness = c->TotalCost + coef * c->TotalVioLoad;
+            } else if (count_infsb == 5) {
+                coef *= 5;
+                c->Fitness = c->TotalCost + coef * c->TotalVioLoad;
+            }
+            count_fsb = 0;
+            count_infsb = 0;
+        }
+
+        Individual tmp_indi;
+        indi_copy(&tmp_indi, c);
+
+        // trditional move
+
+        if (c->Fitness < tmp_indi.Fitness)
+            imp = 1;
+
+        if (c->TotalVioLoad == 0 && c->TotalCost < best_fsb_solution->TotalCost)
+        {
+            indi_copy(best_fsb_solution, c); // check if assign or not
+        }
+    }
+
 }
+
+void lns(Individual *indi, double coef, int nsize, const Task *inst_tasks)
+{
+    indi->Fitness = indi->TotalCost + coef * indi->TotalVioLoad;
+
+    if (nsize == 1) // traditional move
+    {
+        Move si_move, di_move, swap_move, next_move;
+        next_move.fitness = INF;
+
+        single_insertion(&si_move, indi, coef, inst_tasks);
+        double_insertion(&di_move, indi, coef, inst_tasks);
+        swap(&swap_move, indi, coef, inst_tasks);
+
+        if (si_move.fitness < next_move.fitness)
+            next_move = si_move;
+
+        if (di_move.fitness < next_move.fitness)
+            next_move = di_move;
+
+        if (swap_move.fitness < next_move.fitness)
+            next_move = swap_move;
+
+        int orig_ptr = 0, targ_ptr = 0;
+        int seg_ptr1 = 0, seg_ptr2 = 0;
+        for (int i = 1; i < indi->Sequence[0]; i++)
+        {
+            if (indi->Sequence[i] == 0)
+            {
+                if (seg_ptr1 < next_move.orig_seg)
+                    seg_ptr1 ++;
+
+                if (seg_ptr2 < next_move.targ_seg)
+                    seg_ptr2 ++;
+
+                if (seg_ptr1 == next_move.orig_seg && orig_ptr == 0)
+                    orig_ptr = i + next_move.orig_pos - 1;
+
+                if (seg_ptr2 == next_move.targ_seg && targ_ptr == 0)
+                    orig_ptr = i + next_move.targ_pos - 1;
+            }
+            if (orig_ptr != 0 && targ_ptr != 0)
+                break;
+        }
+
+        switch (next_move.type) {
+            case SI:
+                {
+                    delete_element(indi->Sequence, orig_ptr);
+                    if (targ_ptr > orig_ptr)
+                        targ_ptr --;
+                    indi->Loads[next_move.orig_seg] -= inst_tasks[next_move.task1].demand;
+                    if (next_move.targ_seg > indi->Loads[0])
+                    {
+                        indi->Sequence[0] ++;
+                        indi->Sequence[indi->Sequence[0]] = next_move.task1;
+                        indi->Sequence[0] ++;
+                        indi->Sequence[indi->Sequence[0]] = 0;
+                        indi->Loads[0] ++;
+                        indi->Loads[indi->Loads[0]] = inst_tasks[next_move.task1].demand;
+                    } else {
+                        add_element(indi->Sequence, next_move.task1, targ_ptr);
+                        indi->Loads[next_move.targ_seg] += inst_tasks[next_move.task1].demand;
+                    }
+                }
+                break;
+            case DI:
+                {
+                    delete_element(indi->Sequence, orig_ptr+1);
+                    delete_element(indi->Sequence, orig_ptr);
+                    if (targ_ptr > orig_ptr)
+                        targ_ptr -= 2;
+
+                    indi->Loads[next_move.orig_seg] -= inst_tasks[next_move.task1].demand + inst_tasks[next_move.task2].demand;
+                    if (next_move.targ_seg > indi->Loads[0])
+                    {
+                        indi->Sequence[0] ++;
+                        indi->Sequence[indi->Sequence[0]] = next_move.task1;
+                        indi->Sequence[0] ++;
+                        indi->Sequence[indi->Sequence[0]] = next_move.task2;
+                        indi->Sequence[0] ++;
+                        indi->Sequence[indi->Sequence[0]] = 0;
+                        indi->Loads[0] ++;
+                        indi->Loads[indi->Loads[0]] = inst_tasks[next_move.task1].demand + inst_tasks[next_move.task2].demand;
+                    } else {
+                        add_element(indi->Sequence, next_move.task1, targ_ptr);
+                        add_element(indi->Sequence, next_move.task2, targ_ptr);
+                        indi->Loads[next_move.targ_seg] += inst_tasks[next_move.task1].demand + inst_tasks[next_move.task2].demand;
+                    }
+                }
+                break;
+            case SWAP:
+                {
+                    indi->Sequence[targ_ptr] = next_move.task1;
+                    indi->Sequence[orig_ptr] = next_move.task2;
+                    indi->Loads[orig_ptr] -= inst_tasks[next_move.task1].demand - inst_tasks[next_move.task2].demand;
+                    indi->Loads[targ_ptr] += inst_tasks[next_move.task1].demand - inst_tasks[next_move.task2].demand;
+                }
+                break;
+        }
+
+        indi->TotalCost = next_move.total_cost;
+        indi->TotalVioLoad = next_move.total_vio_load;
+        indi->Fitness = next_move.fitness;
+        if (indi->Loads[next_move.orig_seg] == 0)
+        {
+            if (next_move.total_vio_load == DI && next_move.orig_seg > next_move.targ_seg)
+            {
+                delete_element(indi->Sequence, orig_ptr+1);
+            } else {
+                delete_element(indi->Sequence, orig_ptr);
+            }
+
+            delete_element(indi->Loads, next_move.orig_seg);
+        }
+
+    } else {
+        // merge and split
+    }
+}
+
+
+void single_insertion(Move *best_move, Individual *indi, double coef, const Task *inst_tasks)
+{
+    best_move->type = SI;
+    best_move->fitness = INF;
+
+    int i, j, s1, s2;
+
+    task_routes[0][0] = 1;
+    task_routes[1][0] = 1;
+    task_routes[1][1] = 0;
+    for (i = 2; i <= indi->Sequence[0]; i++)
+    {
+        task_routes[task_routes[0][0]][0] ++;
+        task_routes[task_routes[0][0]][task_routes[task_routes[0][0]][0]] = indi->Sequence[i];
+        if (indi->Sequence[0] == 0 && i < indi->Sequence[0])
+        {
+            task_routes[0][0] ++;
+            task_routes[task_routes[0][0]][0] = 1;
+            task_routes[task_routes[0][0]][1] = 0;
+        }
+    }
+
+    Move tmp_move;
+    for (s1 = 1; s1 <= task_routes[0][0]; s1++)
+    {
+        tmp_move.orig_seg = s1;
+        for (i = 2; i < task_routes[s1][0]; i++)
+        {
+            tmp_move.orig_pos = i;
+
+            for (s2 = 1; s2 <= task_routes[0][0]+1; s2++)
+            {
+
+                if (s2 == s1)
+                    continue;
+
+                tmp_move.targ_seg = s2;
+                if (s2 > task_routes[0][0])
+                {
+                    tmp_move.total_vio_load = indi->TotalVioLoad;
+                    if (indi->Loads[s1] > capacity)
+                        tmp_move.total_vio_load -= indi->Loads[s1]-capacity;
+                    if (indi->Loads[s1]-inst_tasks[task_routes[s1][i]].demand > capacity)
+                        tmp_move.total_vio_load += indi->Loads[s1]-inst_tasks[task_routes[s1][i]].demand-capacity;
+
+                    tmp_move.task1 = task_routes[s1][i];
+
+                    tmp_move.total_cost = indi->TotalCost + min_cost[inst_tasks[task_routes[s1][i-1]].tail_node][inst_tasks[task_routes[s1][i+1]].head_node]
+                            + min_cost[DEPOT][inst_tasks[tmp_move.task1].head_node]
+                            + min_cost[inst_tasks[tmp_move.task1].tail_node][DEPOT]
+                            - min_cost[inst_tasks[task_routes[s1][i-1]].tail_node][inst_tasks[task_routes[s1][i]].head_node]
+                            - min_cost[inst_tasks[task_routes[s1][i]].tail_node][inst_tasks[task_routes[s1][i+1]].head_node];
+
+                    tmp_move.fitness = tmp_move.total_cost+coef*tmp_move.total_vio_load;
+
+                    if (tmp_move.fitness < best_move->fitness)
+                    {
+                        best_move->task1 = tmp_move.task1;
+                        best_move->orig_seg = tmp_move.orig_seg;
+                        best_move->targ_seg = tmp_move.targ_seg;
+                        best_move->orig_pos = tmp_move.orig_pos;
+                        best_move->targ_pos = tmp_move.targ_pos;
+                        best_move->total_cost = tmp_move.total_cost;
+                        best_move->total_vio_load = tmp_move.total_vio_load;
+                        best_move->fitness = tmp_move.fitness;
+                    }
+                    continue;
+                }
+
+                for (j = 2; j <= task_routes[s2][0]; j++)
+                {
+                    if (inst_tasks[task_routes[s2][j-1]].tail_node == inst_tasks[task_routes[s2][j]].head_node)
+                        continue;
+
+                    tmp_move.targ_pos = j;
+                    tmp_move.total_vio_load = indi->TotalVioLoad;
+                    if (indi->Loads[s1] > capacity)
+                        tmp_move.total_vio_load -= indi->Loads[s1]-capacity;
+                    if (indi->Loads[s2] > capacity)
+                        tmp_move.total_vio_load -= indi->Loads[s2]-capacity;
+                    if (indi->Loads[s1]-inst_tasks[task_routes[s1][i]].demand > capacity)
+                        tmp_move.total_vio_load += indi->Loads[s1]-inst_tasks[task_routes[s1][i]].demand-capacity;
+                    if (indi->Loads[s2]+inst_tasks[task_routes[s1][i]].demand > capacity)
+                        tmp_move.total_vio_load += indi->Loads[s2]+inst_tasks[task_routes[s1][i]].demand-capacity;
+
+
+                    tmp_move.task1 = task_routes[s1][i];
+                    tmp_move.total_cost = indi->TotalCost
+                            + min_cost[inst_tasks[task_routes[s1][i-1]].tail_node][inst_tasks[task_routes[s1][i+1]].head_node]
+                            - min_cost[inst_tasks[task_routes[s1][i-1]].tail_node][inst_tasks[task_routes[s1][i]].head_node]
+                            - min_cost[inst_tasks[task_routes[s1][i]].tail_node][inst_tasks[task_routes[s1][i+1]].head_node]
+                            + min_cost[inst_tasks[task_routes[s2][j-1]].tail_node][inst_tasks[tmp_move.task1].head_node]
+                            + min_cost[inst_tasks[tmp_move.task1].tail_node][inst_tasks[task_routes[s2][j]].head_node]
+                            - min_cost[inst_tasks[task_routes[s2][j-1]].tail_node][inst_tasks[task_routes[s2][j]].head_node];
+
+                    tmp_move.fitness = tmp_move.total_cost+coef*tmp_move.total_vio_load;
+                    if (tmp_move.fitness < best_move->fitness)
+                    {
+                        best_move->task1 = tmp_move.task1;
+                        best_move->orig_seg = tmp_move.orig_seg;
+                        best_move->targ_seg = tmp_move.targ_seg;
+                        best_move->orig_pos = tmp_move.orig_pos;
+                        best_move->targ_pos = tmp_move.targ_pos;
+                        best_move->total_cost = tmp_move.total_cost;
+                        best_move->total_vio_load = tmp_move.total_vio_load;
+                        best_move->fitness = tmp_move.fitness;
+                    }
+
+
+                    tmp_move.task1 = inst_tasks[task_routes[s1][i]].inverse;
+                    tmp_move.total_cost = indi->TotalCost
+                            + min_cost[inst_tasks[task_routes[s1][i-1]].tail_node][inst_tasks[task_routes[s1][i+1]].head_node]
+                            - min_cost[inst_tasks[task_routes[s1][i-1]].tail_node][inst_tasks[task_routes[s1][i]].head_node]
+                            - min_cost[inst_tasks[task_routes[s1][i]].tail_node][inst_tasks[task_routes[s1][i+1]].head_node]
+                            + min_cost[inst_tasks[task_routes[s2][j-1]].tail_node][inst_tasks[tmp_move.task1].head_node]
+                            + min_cost[inst_tasks[tmp_move.task1].tail_node][inst_tasks[task_routes[s2][j]].head_node]
+                            - min_cost[inst_tasks[task_routes[s2][j-1]].tail_node][inst_tasks[task_routes[s2][j]].head_node];
+
+                    tmp_move.fitness = tmp_move.total_cost+coef*tmp_move.total_vio_load;
+                    if (tmp_move.fitness < best_move->fitness)
+                    {
+                        best_move->task1 = tmp_move.task1;
+                        best_move->orig_seg = tmp_move.orig_seg;
+                        best_move->targ_seg = tmp_move.targ_seg;
+                        best_move->orig_pos = tmp_move.orig_pos;
+                        best_move->targ_pos = tmp_move.targ_pos;
+                        best_move->total_cost = tmp_move.total_cost;
+                        best_move->total_vio_load = tmp_move.total_vio_load;
+                        best_move->fitness = tmp_move.fitness;
+                    }
+                }
+            }
+        }
+    }
+}
+
+void double_insertion(Move *best_move, Individual *indi, double coef, const Task *inst_tasks)
+{
+    best_move->type = DI;
+    best_move->fitness = INF;
+
+    int i, j, s1, s2;
+
+    task_routes[0][0] = 1;
+    task_routes[1][0] = 1;
+    task_routes[1][1] = 0;
+    for (i = 2; i <= indi->Sequence[0]; i++)
+    {
+        task_routes[task_routes[0][0]][0] ++;
+        task_routes[task_routes[0][0]][task_routes[task_routes[0][0]][0]] = indi->Sequence[i];
+        if (indi->Sequence[0] == 0 && i < indi->Sequence[0])
+        {
+            task_routes[0][0] ++;
+            task_routes[task_routes[0][0]][0] = 1;
+            task_routes[task_routes[0][0]][1] = 0;
+        }
+    }
+
+    Move tmp_move;
+
+    for (s1 = 1; s1 <= task_routes[0][0]; s1++)
+    {
+        if (task_routes[s1][0] < 4)
+            continue;
+
+        tmp_move.orig_seg = s1;
+        for (i = 2; i < task_routes[s1][0]-1; i++)
+        {
+            tmp_move.orig_pos = i;
+            for (s2 = 1; s2 <= task_routes[0][0]+1; s2++)  /* s2 > task_routes[0][0] --> create a new route */
+            {
+                if (s2 == s1)
+                    continue;
+
+                tmp_move.targ_seg = s2;
+                if (s2 > task_routes[0][0] /* && task_routes[0][0] < vehicle_num*/)
+                {
+                    if (task_routes[s1][0] <= 4)
+                        continue;
+
+                    tmp_move.total_vio_load = indi->TotalVioLoad;
+                    if (indi->Loads[s1] > capacity)
+                        tmp_move.total_vio_load -= indi->Loads[s1]-capacity;
+                    if (indi->Loads[s1]-inst_tasks[task_routes[s1][i]].demand-inst_tasks[task_routes[s1][i+1]].demand > capacity)
+                        tmp_move.total_vio_load += indi->Loads[s1]-inst_tasks[task_routes[s1][i]].demand-inst_tasks[task_routes[s1][i+1]].demand-capacity;
+
+                    tmp_move.task1 = task_routes[s1][i];
+                    tmp_move.task2 = task_routes[s1][i+1];
+
+                    tmp_move.total_cost = indi->TotalCost +
+                                          min_cost[inst_tasks[task_routes[s1][i-1]].tail_node][inst_tasks[task_routes[s1][i+2]].head_node] -
+                                          min_cost[inst_tasks[task_routes[s1][i-1]].tail_node][inst_tasks[task_routes[s1][i]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s1][i]].tail_node][inst_tasks[task_routes[s1][i+1]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s1][i+1]].tail_node][inst_tasks[task_routes[s1][i+2]].head_node]+
+                                          min_cost[DEPOT][inst_tasks[tmp_move.task1].head_node]+
+                                          min_cost[inst_tasks[tmp_move.task1].tail_node][inst_tasks[tmp_move.task2].head_node]+
+                                          min_cost[inst_tasks[tmp_move.task2].tail_node][DEPOT];
+
+                    tmp_move.fitness = tmp_move.total_cost+coef*tmp_move.total_vio_load;
+
+                    if (tmp_move.fitness < best_move->fitness)
+                    {
+                        best_move->task1 = tmp_move.task1;
+                        best_move->task2 = tmp_move.task2;
+                        best_move->orig_seg = tmp_move.orig_seg;
+                        best_move->targ_seg = tmp_move.targ_seg;
+                        best_move->orig_pos = tmp_move.orig_pos;
+                        best_move->targ_pos = tmp_move.targ_pos;
+                        best_move->total_cost = tmp_move.total_cost;
+                        best_move->total_vio_load = tmp_move.total_vio_load;
+                        best_move->fitness = tmp_move.fitness;
+                    }
+
+                    tmp_move.task1 = task_routes[s1][i];
+                    tmp_move.task2 = inst_tasks[task_routes[s1][i+1]].inverse;
+
+                    tmp_move.total_cost = indi->TotalCost+
+                                          min_cost[inst_tasks[task_routes[s1][i-1]].tail_node][inst_tasks[task_routes[s1][i+2]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s1][i-1]].tail_node][inst_tasks[task_routes[s1][i]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s1][i]].tail_node][inst_tasks[task_routes[s1][i+1]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s1][i+1]].tail_node][inst_tasks[task_routes[s1][i+2]].head_node]+
+                                          min_cost[DEPOT][inst_tasks[tmp_move.task1].head_node]+
+                                          min_cost[inst_tasks[tmp_move.task1].tail_node][inst_tasks[tmp_move.task2].head_node]+
+                                          min_cost[inst_tasks[tmp_move.task2].tail_node][DEPOT];
+
+                    tmp_move.fitness = tmp_move.total_cost+coef*tmp_move.total_vio_load;
+
+                    if (tmp_move.fitness < best_move->fitness)
+                    {
+                        best_move->task1 = tmp_move.task1;
+                        best_move->task2 = tmp_move.task2;
+                        best_move->orig_seg = tmp_move.orig_seg;
+                        best_move->targ_seg = tmp_move.targ_seg;
+                        best_move->orig_pos = tmp_move.orig_pos;
+                        best_move->targ_pos = tmp_move.targ_pos;
+                        best_move->total_cost = tmp_move.total_cost;
+                        best_move->total_vio_load = tmp_move.total_vio_load;
+                        best_move->fitness = tmp_move.fitness;
+                    }
+                    continue;
+                }
+
+                for (j = 2; j <= task_routes[s2][0]; j++)
+                {
+                    if (inst_tasks[task_routes[s2][j-1]].tail_node == inst_tasks[task_routes[s2][j]].head_node)
+                        continue;
+
+                    tmp_move.targ_pos = j;
+                    tmp_move.total_vio_load = indi->TotalVioLoad;
+                    if (indi->Loads[s1] > capacity)
+                        tmp_move.total_vio_load -= indi->Loads[s1]-capacity;
+                    if (indi->Loads[s2] > capacity)
+                        tmp_move.total_vio_load -= indi->Loads[s2]-capacity;
+                    if (indi->Loads[s1]-inst_tasks[task_routes[s1][i]].demand-inst_tasks[task_routes[s1][i+1]].demand > capacity)
+                        tmp_move.total_vio_load += indi->Loads[s1]-inst_tasks[task_routes[s1][i]].demand-inst_tasks[task_routes[s1][i+1]].demand-capacity;
+                    if (indi->Loads[s2]+inst_tasks[task_routes[s1][i]].demand+inst_tasks[task_routes[s1][i+1]].demand > capacity)
+                        tmp_move.total_vio_load += indi->Loads[s2]+inst_tasks[task_routes[s1][i]].demand+inst_tasks[task_routes[s1][i+1]].demand-capacity;
+
+                    //
+
+                    tmp_move.task1 = task_routes[s1][i];
+                    tmp_move.task2 = task_routes[s1][i+1];
+
+                    tmp_move.total_cost = indi->TotalCost+
+                                          min_cost[inst_tasks[task_routes[s1][i-1]].tail_node][inst_tasks[task_routes[s1][i+2]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s1][i-1]].tail_node][inst_tasks[task_routes[s1][i]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s1][i]].tail_node][inst_tasks[task_routes[s1][i+1]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s1][i+1]].tail_node][inst_tasks[task_routes[s1][i+2]].head_node]+
+                                          min_cost[inst_tasks[task_routes[s2][j-1]].tail_node][inst_tasks[tmp_move.task1].head_node]+
+                                          min_cost[inst_tasks[tmp_move.task1].tail_node][inst_tasks[tmp_move.task2].head_node]+
+                                          min_cost[inst_tasks[tmp_move.task2].tail_node][inst_tasks[task_routes[s2][j]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s2][j-1]].tail_node][inst_tasks[task_routes[s2][j]].head_node];
+
+                    tmp_move.fitness = tmp_move.total_cost+coef*tmp_move.total_vio_load;
+
+                    if (tmp_move.fitness < best_move->fitness)
+                    {
+                        best_move->task1 = tmp_move.task1;
+                        best_move->task2 = tmp_move.task2;
+                        best_move->orig_seg = tmp_move.orig_seg;
+                        best_move->targ_seg = tmp_move.targ_seg;
+                        best_move->orig_pos = tmp_move.orig_pos;
+                        best_move->targ_pos = tmp_move.targ_pos;
+                        best_move->total_cost = tmp_move.total_cost;
+                        best_move->total_vio_load = tmp_move.total_vio_load;
+                        best_move->fitness = tmp_move.fitness;
+                    }
+
+                    //
+
+                    tmp_move.task1 = inst_tasks[task_routes[s1][i]].inverse;
+                    tmp_move.task2 = task_routes[s1][i+1];
+
+                    tmp_move.total_cost = indi->TotalCost+
+                                          min_cost[inst_tasks[task_routes[s1][i-1]].tail_node][inst_tasks[task_routes[s1][i+2]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s1][i-1]].tail_node][inst_tasks[task_routes[s1][i]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s1][i]].tail_node][inst_tasks[task_routes[s1][i+1]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s1][i+1]].tail_node][inst_tasks[task_routes[s1][i+2]].head_node]+
+                                          min_cost[inst_tasks[task_routes[s2][j-1]].tail_node][inst_tasks[tmp_move.task1].head_node]+
+                                          min_cost[inst_tasks[tmp_move.task1].tail_node][inst_tasks[tmp_move.task2].head_node]+
+                                          min_cost[inst_tasks[tmp_move.task2].tail_node][inst_tasks[task_routes[s2][j]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s2][j-1]].tail_node][inst_tasks[task_routes[s2][j]].head_node];
+
+                    tmp_move.fitness = tmp_move.total_cost+coef*tmp_move.total_vio_load;
+
+                    if (tmp_move.fitness < best_move->fitness)
+                    {
+                        best_move->task1 = tmp_move.task1;
+                        best_move->task2 = tmp_move.task2;
+                        best_move->orig_seg = tmp_move.orig_seg;
+                        best_move->targ_seg = tmp_move.targ_seg;
+                        best_move->orig_pos = tmp_move.orig_pos;
+                        best_move->targ_pos = tmp_move.targ_pos;
+                        best_move->total_cost = tmp_move.total_cost;
+                        best_move->total_vio_load = tmp_move.total_vio_load;
+                        best_move->fitness = tmp_move.fitness;
+                    }
+
+                    //
+
+                    tmp_move.task1 = task_routes[s1][i];
+                    tmp_move.task2 = inst_tasks[task_routes[s1][i+1]].inverse;
+
+                    tmp_move.total_cost = indi->TotalCost+
+                                          min_cost[inst_tasks[task_routes[s1][i-1]].tail_node][inst_tasks[task_routes[s1][i+2]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s1][i-1]].tail_node][inst_tasks[task_routes[s1][i]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s1][i]].tail_node][inst_tasks[task_routes[s1][i+1]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s1][i+1]].tail_node][inst_tasks[task_routes[s1][i+2]].head_node]+
+                                          min_cost[inst_tasks[task_routes[s2][j-1]].tail_node][inst_tasks[tmp_move.task1].head_node]+
+                                          min_cost[inst_tasks[tmp_move.task1].tail_node][inst_tasks[tmp_move.task2].head_node]+
+                                          min_cost[inst_tasks[tmp_move.task2].tail_node][inst_tasks[task_routes[s2][j]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s2][j-1]].tail_node][inst_tasks[task_routes[s2][j]].head_node];
+
+                    tmp_move.fitness = tmp_move.total_cost+coef*tmp_move.total_vio_load;
+
+                    if (tmp_move.fitness < best_move->fitness)
+                    {
+                        best_move->task1 = tmp_move.task1;
+                        best_move->task2 = tmp_move.task2;
+                        best_move->orig_seg = tmp_move.orig_seg;
+                        best_move->targ_seg = tmp_move.targ_seg;
+                        best_move->orig_pos = tmp_move.orig_pos;
+                        best_move->targ_pos = tmp_move.targ_pos;
+                        best_move->total_cost = tmp_move.total_cost;
+                        best_move->total_vio_load = tmp_move.total_vio_load;
+                        best_move->fitness = tmp_move.fitness;
+                    }
+
+                    //
+
+                    tmp_move.task1 = inst_tasks[task_routes[s1][i]].inverse;
+                    tmp_move.task2 = inst_tasks[task_routes[s1][i+1]].inverse;
+
+                    tmp_move.total_cost = indi->TotalCost+
+                                          min_cost[inst_tasks[task_routes[s1][i-1]].tail_node][inst_tasks[task_routes[s1][i+2]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s1][i-1]].tail_node][inst_tasks[task_routes[s1][i]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s1][i]].tail_node][inst_tasks[task_routes[s1][i+1]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s1][i+1]].tail_node][inst_tasks[task_routes[s1][i+2]].head_node]+
+                                          min_cost[inst_tasks[task_routes[s2][j-1]].tail_node][inst_tasks[tmp_move.task1].head_node]+
+                                          min_cost[inst_tasks[tmp_move.task1].tail_node][inst_tasks[tmp_move.task2].head_node]+
+                                          min_cost[inst_tasks[tmp_move.task2].tail_node][inst_tasks[task_routes[s2][j]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s2][j-1]].tail_node][inst_tasks[task_routes[s2][j]].head_node];
+
+                    tmp_move.fitness = tmp_move.total_cost+coef*tmp_move.total_vio_load;
+
+                    if (tmp_move.fitness < best_move->fitness)
+                    {
+                        best_move->task1 = tmp_move.task1;
+                        best_move->task2 = tmp_move.task2;
+                        best_move->orig_seg = tmp_move.orig_seg;
+                        best_move->targ_seg = tmp_move.targ_seg;
+                        best_move->orig_pos = tmp_move.orig_pos;
+                        best_move->targ_pos = tmp_move.targ_pos;
+                        best_move->total_cost = tmp_move.total_cost;
+                        best_move->total_vio_load = tmp_move.total_vio_load;
+                        best_move->fitness = tmp_move.fitness;
+                    }
+                }
+            }
+        }
+    }
+}
+
+void swap(Move *best_move, Individual *indi, double coef, const Task *inst_tasks)
+{
+    best_move->type = SWAP;
+    best_move->fitness = INF;
+
+    int i, j, s1, s2;
+
+    task_routes[0][0] = 1;
+    task_routes[1][0] = 1;
+    task_routes[1][1] = 0;
+    for (i = 2; i <= indi->Sequence[0]; i++) {
+        task_routes[task_routes[0][0]][0]++;
+        task_routes[task_routes[0][0]][task_routes[task_routes[0][0]][0]] = indi->Sequence[i];
+        if (indi->Sequence[0] == 0 && i < indi->Sequence[0]) {
+            task_routes[0][0]++;
+            task_routes[task_routes[0][0]][0] = 1;
+            task_routes[task_routes[0][0]][1] = 0;
+        }
+    }
+
+    Move tmp_move;
+    for (s1 = 1; s1 < task_routes[0][0]; s1++)
+    {
+        tmp_move.orig_seg = s1;
+        for (i = 2; i < task_routes[s1][0]; i++)
+        {
+            if (inst_tasks[task_routes[s1][i-1]].tail_node == inst_tasks[task_routes[s1][i]].head_node &&
+                inst_tasks[task_routes[s1][i]].tail_node == inst_tasks[task_routes[s1][i+1]].head_node)
+                continue;
+
+            tmp_move.orig_pos = i;
+            for (s2 = s1+1; s2 <= task_routes[0][0]; s2++)
+            {
+                tmp_move.targ_seg = s2;
+                for (j = 2; j < task_routes[s2][0]; j++)
+                {
+                    if (inst_tasks[task_routes[s2][j-1]].tail_node == inst_tasks[task_routes[s2][j]].head_node &&
+                        inst_tasks[task_routes[s2][j]].tail_node == inst_tasks[task_routes[s2][j+1]].head_node)
+                        continue;
+
+                    tmp_move.targ_pos = j;
+
+                    tmp_move.total_vio_load = indi->TotalVioLoad;
+                    if (indi->Loads[s1] > capacity)
+                        tmp_move.total_vio_load -= indi->Loads[s1]-capacity;
+                    if (indi->Loads[s2] > capacity)
+                        tmp_move.total_vio_load -= indi->Loads[s2]-capacity;
+                    if (indi->Loads[s1]-inst_tasks[task_routes[s1][i]].demand+inst_tasks[task_routes[s2][j]].demand > capacity)
+                        tmp_move.total_vio_load += indi->Loads[s1]-inst_tasks[task_routes[s1][i]].demand+inst_tasks[task_routes[s2][j]].demand-capacity;
+                    if (indi->Loads[s2]+inst_tasks[task_routes[s1][i]].demand-inst_tasks[task_routes[s2][j]].demand > capacity)
+                        tmp_move.total_vio_load += indi->Loads[s2]+inst_tasks[task_routes[s1][i]].demand-inst_tasks[task_routes[s2][j]].demand-capacity;
+
+                    tmp_move.task1 = task_routes[s1][i];
+                    tmp_move.task2 = task_routes[s2][j];
+
+                    tmp_move.total_cost = indi->TotalCost+
+                                          min_cost[inst_tasks[task_routes[s1][i-1]].tail_node][inst_tasks[tmp_move.task2].head_node]+
+                                          min_cost[inst_tasks[tmp_move.task2].tail_node][inst_tasks[task_routes[s1][i+1]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s1][i-1]].tail_node][inst_tasks[task_routes[s1][i]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s1][i]].tail_node][inst_tasks[task_routes[s1][i+1]].head_node]+
+                                          min_cost[inst_tasks[task_routes[s2][j-1]].tail_node][inst_tasks[tmp_move.task1].head_node]+
+                                          min_cost[inst_tasks[tmp_move.task1].tail_node][inst_tasks[task_routes[s2][j+1]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s2][j-1]].tail_node][inst_tasks[task_routes[s2][j]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s2][j]].tail_node][inst_tasks[task_routes[s2][j+1]].head_node];
+
+                    tmp_move.fitness = tmp_move.total_cost+coef*tmp_move.total_vio_load;
+
+                    if (tmp_move.fitness < best_move->fitness)
+                    {
+                        best_move->task1 = tmp_move.task1;
+                        best_move->task2 = tmp_move.task2;
+                        best_move->orig_seg = tmp_move.orig_seg;
+                        best_move->targ_seg = tmp_move.targ_seg;
+                        best_move->orig_pos = tmp_move.orig_pos;
+                        best_move->targ_pos = tmp_move.targ_pos;
+                        best_move->total_cost = tmp_move.total_cost;
+                        best_move->total_vio_load = tmp_move.total_vio_load;
+                        best_move->fitness = tmp_move.fitness;
+                    }
+
+                    //
+
+                    tmp_move.task1 = inst_tasks[task_routes[s1][i]].inverse;
+                    tmp_move.task2 = task_routes[s2][j];
+
+                    tmp_move.total_cost = indi->TotalCost +
+                                          min_cost[inst_tasks[task_routes[s1][i-1]].tail_node][inst_tasks[tmp_move.task2].head_node]+
+                                          min_cost[inst_tasks[tmp_move.task2].tail_node][inst_tasks[task_routes[s1][i+1]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s1][i-1]].tail_node][inst_tasks[task_routes[s1][i]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s1][i]].tail_node][inst_tasks[task_routes[s1][i+1]].head_node]+
+                                          min_cost[inst_tasks[task_routes[s2][j-1]].tail_node][inst_tasks[tmp_move.task1].head_node]+
+                                          min_cost[inst_tasks[tmp_move.task1].tail_node][inst_tasks[task_routes[s2][j+1]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s2][j-1]].tail_node][inst_tasks[task_routes[s2][j]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s2][j]].tail_node][inst_tasks[task_routes[s2][j+1]].head_node];
+
+                    tmp_move.fitness = tmp_move.total_cost+coef*tmp_move.total_vio_load;
+
+                    if (tmp_move.fitness < best_move->fitness)
+                    {
+                        best_move->task1 = tmp_move.task1;
+                        best_move->task2 = tmp_move.task2;
+                        best_move->orig_seg = tmp_move.orig_seg;
+                        best_move->targ_seg = tmp_move.targ_seg;
+                        best_move->orig_pos = tmp_move.orig_pos;
+                        best_move->targ_pos = tmp_move.targ_pos;
+                        best_move->total_cost = tmp_move.total_cost;
+                        best_move->total_vio_load = tmp_move.total_vio_load;
+                        best_move->fitness = tmp_move.fitness;
+                    }
+
+                    //
+
+                    tmp_move.task1 = task_routes[s1][i];
+                    tmp_move.task2 = inst_tasks[task_routes[s2][j]].inverse;
+
+                    tmp_move.total_cost = indi->TotalCost+
+                                          min_cost[inst_tasks[task_routes[s1][i-1]].tail_node][inst_tasks[tmp_move.task2].head_node]+
+                                          min_cost[inst_tasks[tmp_move.task2].tail_node][inst_tasks[task_routes[s1][i+1]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s1][i-1]].tail_node][inst_tasks[task_routes[s1][i]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s1][i]].tail_node][inst_tasks[task_routes[s1][i+1]].head_node]+
+                                          min_cost[inst_tasks[task_routes[s2][j-1]].tail_node][inst_tasks[tmp_move.task1].head_node]+
+                                          min_cost[inst_tasks[tmp_move.task1].tail_node][inst_tasks[task_routes[s2][j+1]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s2][j-1]].tail_node][inst_tasks[task_routes[s2][j]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s2][j]].tail_node][inst_tasks[task_routes[s2][j+1]].head_node];
+
+                    tmp_move.fitness = tmp_move.total_cost+coef*tmp_move.total_vio_load;
+
+                    if (tmp_move.fitness < best_move->fitness)
+                    {
+                        best_move->task1 = tmp_move.task1;
+                        best_move->task2 = tmp_move.task2;
+                        best_move->orig_seg = tmp_move.orig_seg;
+                        best_move->targ_seg = tmp_move.targ_seg;
+                        best_move->orig_pos = tmp_move.orig_pos;
+                        best_move->targ_pos = tmp_move.targ_pos;
+                        best_move->total_cost = tmp_move.total_cost;
+                        best_move->total_vio_load = tmp_move.total_vio_load;
+                        best_move->fitness = tmp_move.fitness;
+                    }
+
+                    //
+
+                    tmp_move.task1 = inst_tasks[task_routes[s1][i]].inverse;
+                    tmp_move.task2 = inst_tasks[task_routes[s2][j]].inverse;
+
+                    tmp_move.total_cost = indi->TotalCost+
+                                          min_cost[inst_tasks[task_routes[s1][i-1]].tail_node][inst_tasks[tmp_move.task2].head_node]+
+                                          min_cost[inst_tasks[tmp_move.task2].tail_node][inst_tasks[task_routes[s1][i+1]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s1][i-1]].tail_node][inst_tasks[task_routes[s1][i]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s1][i]].tail_node][inst_tasks[task_routes[s1][i+1]].head_node]+
+                                          min_cost[inst_tasks[task_routes[s2][j-1]].tail_node][inst_tasks[tmp_move.task1].head_node]+
+                                          min_cost[inst_tasks[tmp_move.task1].tail_node][inst_tasks[task_routes[s2][j+1]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s2][j-1]].tail_node][inst_tasks[task_routes[s2][j]].head_node]-
+                                          min_cost[inst_tasks[task_routes[s2][j]].tail_node][inst_tasks[task_routes[s2][j+1]].head_node];
+
+                    tmp_move.fitness = tmp_move.total_cost+coef*tmp_move.total_vio_load;
+
+                    if (tmp_move.fitness < best_move->fitness)
+                    {
+                        best_move->task1 = tmp_move.task1;
+                        best_move->task2 = tmp_move.task2;
+                        best_move->orig_seg = tmp_move.orig_seg;
+                        best_move->targ_seg = tmp_move.targ_seg;
+                        best_move->orig_pos = tmp_move.orig_pos;
+                        best_move->targ_pos = tmp_move.targ_pos;
+                        best_move->total_cost = tmp_move.total_cost;
+                        best_move->total_vio_load = tmp_move.total_vio_load;
+                        best_move->fitness = tmp_move.fitness;
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
