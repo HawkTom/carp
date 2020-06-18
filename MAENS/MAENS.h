@@ -23,7 +23,7 @@
 
 
 # include "../functions.h"
-
+# include "../heutistic.h"
 
 
 typedef struct move

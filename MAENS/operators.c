@@ -671,8 +671,148 @@ void lns(Individual *indi, double coef, int nsize, const Task *inst_tasks)
             delete_element(indi->Loads, next_move.orig_seg);
         }
 
-    } else {
+    }
+    else {
+
+        int i, j, k;
         // merge and split
+        task_routes[0][0] = 1;
+        task_routes[1][0] = 1;
+        task_routes[1][1] = 0;
+        for (i = 2; i <= indi->Sequence[0]; i++)
+        {
+            task_routes[task_routes[0][0]][0] ++;
+            task_routes[task_routes[0][0]][task_routes[task_routes[0][0]][0]] = indi->Sequence[i];
+            if (indi->Sequence[i] == 0)
+            {
+                task_routes[0][0] ++;
+                task_routes[task_routes[0][0]][0] = 1;
+                task_routes[task_routes[0][0]][1] = 0;
+            }
+        }
+
+        if (task_routes[0][0] < nsize)
+            return;
+
+        int multi = task_routes[0][0];
+        long long int ub_trial = task_routes[0][0];
+        for (i = 1; i < nsize; i++)
+        {
+            multi --;
+            ub_trial *= multi;
+        }
+
+        multi = nsize;
+        for (i = 1; i < nsize; i++)
+        {
+            ub_trial /= multi;
+            multi --;
+        }
+
+        int maxcount = ub_trial;
+        if (maxcount > MAX_ENSSIZE)
+            maxcount = MAX_ENSSIZE;
+
+        typedef struct lns_comb{
+            int ids[MAX_NSIZE + 1];
+        } lns_comb;
+
+        lns_comb cand_combs[MAX_ENSSIZE+1];
+
+        int pointers[MAX_NSIZE + 1];
+        for (i = 1; i <= nsize; i++)
+        {
+            pointers[i] = i;
+        }
+
+        int curr_ptr;
+        for (i = 1; i <= maxcount; i++)
+        {
+            cand_combs[i].ids[0] = nsize;
+            for (j = 1; j <= nsize; j++)
+            {
+                cand_combs[i].ids[j] = pointers[j];
+            }
+            curr_ptr = nsize;
+
+            while (pointers[curr_ptr] == task_routes[0][0] - nsize + curr_ptr)
+            {
+                curr_ptr --;
+            }
+            if(curr_ptr == 0)
+                break;
+
+            pointers[curr_ptr] ++;
+            for (j = curr_ptr + 1; j <= nsize;  j++)
+            {
+                pointers[j] = pointers[j-1] + 1;
+            }
+        }
+
+        Individual tmp_indi, next_indi;
+        next_indi.Fitness = INF;
+
+        int lns_routes[MAX_NSIZE+1];
+        int sel_total_load;
+
+        for (i = 0; i < maxcount; i++)
+        {
+            memcpy(lns_routes, cand_combs[i].ids, sizeof(cand_combs[i].ids));
+
+            sel_total_load = 0;
+            for (j = 1; j < lns_routes[0]; j++)
+            {
+                sel_total_load += indi->Loads[lns_routes[j]];
+            }
+
+            if (sel_total_load > capacity)
+                continue;
+
+            int serve_mark[MAX_TASK_TAG_LENGTH];
+            memset(serve_mark, 0, sizeof(serve_mark));
+
+            for (j = 1; j <= lns_routes[0]; j++)
+            {
+                for (k = 2; k < task_routes[j][0]; k++)
+                {
+                    serve_mark[task_routes[lns_routes[j]][k]] = 1;
+                    serve_mark[inst_tasks[task_routes[lns_routes[j]][k]].inverse] = 1;
+                }
+            }
+
+            path_scanning(&tmp_indi, inst_tasks, serve_mark);
+
+            for (j = 1; j <= task_routes[0][0]; j++)
+            {
+                int lnused = 0;
+                for (k = 1; k <= lns_routes[0]; k++)
+                {
+                    if (j == lns_routes[k])
+                    {
+                        lnused = 1;
+                        break;
+                    }
+                }
+                if  (lnused)
+                    continue;
+
+                tmp_indi.Sequence[0] --;
+                JoinArray(tmp_indi.Sequence, task_routes[j]);
+                tmp_indi.Loads[0] ++;
+                tmp_indi.Loads[tmp_indi.Loads[0]] = indi->Loads[j];
+                if (indi->Loads[j] > capacity)
+                    tmp_indi.TotalVioLoad += (indi->Loads[j] - capacity);  // bug in the original program
+            }
+
+            tmp_indi.TotalCost = get_task_seq_total_cost(tmp_indi.Sequence, inst_tasks);
+//            tmp_indi.TotalVioLoad = get_total_vio_load(tmp_indi.Loads);
+            tmp_indi.Fitness = tmp_indi.TotalCost + coef * tmp_indi.TotalVioLoad;
+            if (tmp_indi.Fitness < next_indi.Fitness)
+                indi_copy(&next_indi, &tmp_indi);
+        }
+
+        indi_copy(indi, &next_indi);
+
     }
 }
 
