@@ -224,7 +224,7 @@ void SBX(Individual *xed_child, Individual *p1, Individual *p2, const Task *inst
         }
     }
 
-    for (i = 1; i <= SubPath2[0]; i ++)
+    for (i = 1; i < SubPath2[0]; i ++)
     {
         if (Checked[i])
             continue;
@@ -449,7 +449,7 @@ void SBX(Individual *xed_child, Individual *p1, Individual *p2, const Task *inst
             Routes1[0][0] ++;
             Routes1[Routes1[0][0]][0] = 3;
             Routes1[Routes1[0][0]][1] = 0;
-            Routes1[Routes1[0][0]][0] = BestInsertion.InsertedTask;
+            Routes1[Routes1[0][0]][2] = BestInsertion.InsertedTask;
             Routes1[Routes1[0][0]][3] = 0;
 
             XCLds[0] ++;
@@ -482,6 +482,22 @@ void SBX(Individual *xed_child, Individual *p1, Individual *p2, const Task *inst
     }
     xed_child->TotalVioLoad = get_total_vio_load(xed_child->Loads);
 
+    if (51 + xed_child->Loads[0] + 1 != xed_child->Sequence[0])
+    {
+        int kk = 0;
+        for (int i = 1; i <= Routes1[0][0]; i++)
+        {
+            for (int j = 1; j <= Routes1[i][0]; j++)
+            {
+                printf("%d \t", Routes1[i][j]);
+                kk ++;
+            }
+            printf("\n");
+        }
+        printf("k: %d", kk);
+        int a = 0;
+    }
+
 }
 
 void rand_selection(int *id1, int *id2, int popsize)
@@ -503,7 +519,293 @@ void rand_selection(int *id1, int *id2, int popsize)
     //printf("id1 = %d, id2 = %d, popsize = %d\n", id1, id2, popsize);
 }
 
+void lns1(Individual *indi, double coef, int nsize, const Task *inst_tasks)
+{
+    indi->Fitness = indi->TotalCost+coef*indi->TotalVioLoad;
 
+    if (nsize == 1) // traditional move operators, i.e., single insertion, double insertion, swap, etc.
+    {
+        Move si_move, di_move, swap_move, next_move;
+        next_move.fitness = INF;
+
+        single_insertion(&si_move, indi, coef, inst_tasks);
+        double_insertion(&di_move, indi, coef, inst_tasks);
+        swap(&swap_move, indi, coef, inst_tasks);
+
+        if (si_move.fitness < next_move.fitness)
+            next_move = si_move;
+        if (di_move.fitness < next_move.fitness)
+            next_move = di_move;
+        if (swap_move.fitness < next_move.fitness)
+            next_move = swap_move;
+
+        //printf("next type = %d, task1 = %d, orig_seg = %d, tar_seg = %d, orig_pos = %d, tar_pos = %d, total_cost = %d, fitness = %lf\n", next_move.type, next_move.task1,
+        //	next_move.orig_seg, next_move.targ_seg, next_move.orig_pos, next_move.targ_pos, next_move.total_cost, next_move.fitness);
+
+        int orig_ptr, targ_ptr, seg_ptr1, seg_ptr2;
+        orig_ptr = 0;
+        targ_ptr = 0;
+        seg_ptr1 = 0;
+        seg_ptr2 = 0;
+        for (int i = 1; i < indi->Sequence[0]; i++)
+        {
+            if (indi->Sequence[i] == 0)
+            {
+                if (seg_ptr1 < next_move.orig_seg)
+                    seg_ptr1 ++;
+                if (seg_ptr2 < next_move.targ_seg)
+                    seg_ptr2 ++;
+                if (seg_ptr1 == next_move.orig_seg && orig_ptr == 0)
+                    orig_ptr = i+next_move.orig_pos-1;
+                if (seg_ptr2 == next_move.targ_seg && targ_ptr == 0)
+                    targ_ptr = i+next_move.targ_pos-1;
+            }
+            if (orig_ptr != 0 && targ_ptr != 0)
+                break;
+        }
+
+        //printf("before\n");
+        //print_one_dim_array(indi->sequence);
+        //print_one_dim_array(indi->route_seg_length);
+        //printf("totalcost = %d, maxlength = %d\n", indi->total_cost, indi->max_length);
+
+        switch (next_move.type)
+        {
+            case SI:
+            {
+                delete_element(indi->Sequence, orig_ptr);
+                if (targ_ptr > orig_ptr)
+                    targ_ptr --;
+                //indi->route_seg_length[next_move.orig_seg] = next_move.orig_length;
+                indi->Loads[next_move.orig_seg] -= inst_tasks[next_move.task1].demand;
+                if (next_move.targ_seg > indi->Loads[0])
+                {
+                    indi->Sequence[0] ++;
+                    indi->Sequence[indi->Sequence[0]] = next_move.task1;
+                    indi->Sequence[0] ++;
+                    indi->Sequence[indi->Sequence[0]] = 0;
+                    //indi->route_seg_length[0] ++;
+                    //indi->route_seg_length[indi->route_seg_length[0]] = next_move.targ_length;
+                    indi->Loads[0] ++;
+                    indi->Loads[indi->Loads[0]] = inst_tasks[next_move.task1].demand;
+                }
+                else
+                {
+                    add_element(indi->Sequence, next_move.task1, targ_ptr);
+                    //indi->route_seg_length[next_move.targ_seg] = next_move.targ_length;
+                    indi->Loads[next_move.targ_seg] += inst_tasks[next_move.task1].demand;
+                }
+            }
+                break;
+            case DI:
+            {
+                delete_element(indi->Sequence, orig_ptr+1);
+                delete_element(indi->Sequence, orig_ptr);
+                if (targ_ptr > orig_ptr)
+                    targ_ptr -= 2;
+                //indi->route_seg_length[next_move.orig_seg] = next_move.orig_length;
+                indi->Loads[next_move.orig_seg] -= inst_tasks[next_move.task1].demand+inst_tasks[next_move.task2].demand;
+                if (next_move.targ_seg > indi->Loads[0])
+                {
+                    indi->Sequence[0] ++;
+                    indi->Sequence[indi->Sequence[0]] = next_move.task1;
+                    indi->Sequence[0] ++;
+                    indi->Sequence[indi->Sequence[0]] = next_move.task2;
+                    indi->Sequence[0] ++;
+                    indi->Sequence[indi->Sequence[0]] = 0;
+                    //indi->route_seg_length[0] ++;
+                    //indi->route_seg_length[indi->route_seg_length[0]] = next_move.targ_length;
+                    indi->Loads[0] ++;
+                    indi->Loads[indi->Loads[0]] = inst_tasks[next_move.task1].demand+inst_tasks[next_move.task2].demand;
+                }
+                else
+                {
+                    add_element(indi->Sequence, next_move.task2, targ_ptr);
+                    add_element(indi->Sequence, next_move.task1, targ_ptr);
+                    //indi->route_seg_length[next_move.targ_seg] = next_move.targ_length;
+                    indi->Loads[next_move.targ_seg] += inst_tasks[next_move.task1].demand+inst_tasks[next_move.task2].demand;
+                }
+            }
+                break;
+            case SWAP:
+            {
+                indi->Sequence[targ_ptr] = next_move.task1;
+                indi->Sequence[orig_ptr] = next_move.task2;
+                //indi->route_seg_length[next_move.orig_seg] = next_move.orig_length;
+                //indi->route_seg_length[next_move.targ_seg] = next_move.targ_length;
+                indi->Loads[next_move.orig_seg] -= inst_tasks[next_move.task1].demand-inst_tasks[next_move.task2].demand;
+                indi->Loads[next_move.targ_seg] += inst_tasks[next_move.task1].demand-inst_tasks[next_move.task2].demand;
+            }
+                break;
+        }
+        //indi->max_length = next_move.max_length;
+        indi->TotalCost = next_move.total_cost;
+        indi->TotalVioLoad = next_move.total_vio_load;
+        indi->Fitness = next_move.fitness;
+
+        if (indi->Loads[next_move.orig_seg] == 0)
+        {
+            if (next_move.type == DI && next_move.orig_seg > next_move.targ_seg)
+            {
+                delete_element(indi->Sequence, orig_ptr+1);
+            }
+            else
+            {
+                delete_element(indi->Sequence, orig_ptr);
+            }
+            //delete_element(indi->route_seg_length, next_move.orig_seg);
+            delete_element(indi->Loads, next_move.orig_seg);
+        }
+
+        //printf("after\n");
+        //print_one_dim_array(indi->sequence);
+        //print_one_dim_array(indi->route_seg_length);
+        //printf("totalcost = %d, maxlength = %d\n", indi->total_cost, indi->max_length);
+    }
+    else
+    {
+        Individual tmp_indi, next_indi;
+        next_indi.Fitness = INF;
+        //int task_routes[MAX_SEG_TAG_LENGTH][MAX_TASK_SEG_LENGTH];
+
+        task_routes[0][0] = 1;
+        task_routes[1][0] = 1;
+        task_routes[1][1] = 0;
+        for (int i = 2; i <= indi->Sequence[0]; i++)
+        {
+            task_routes[task_routes[0][0]][0] ++;
+            task_routes[task_routes[0][0]][task_routes[task_routes[0][0]][0]] = indi->Sequence[i];
+
+            if (indi->Sequence[i] == 0 && i < indi->Sequence[0])
+            {
+                task_routes[0][0] ++;
+                task_routes[task_routes[0][0]][0] = 1;
+                task_routes[task_routes[0][0]][1] = 0;
+            }
+        }
+
+        if (task_routes[0][0] < nsize)
+            return;
+
+        int multi = task_routes[0][0];
+        long long int ub_trial = task_routes[0][0];
+        for (int i = 1; i < nsize; i++)
+        {
+            multi --;
+            ub_trial *= multi;
+        }
+        multi = nsize;
+        for (int i = 1; i < nsize; i++)
+        {
+            ub_trial /= multi;
+            multi --;
+        }
+
+        int maxcount = ub_trial;
+        if (maxcount > MAX_ENSSIZE)
+            maxcount = MAX_ENSSIZE;
+
+        typedef struct lns_comb
+        {
+            int ids[MAX_NSIZE+1];
+        }lns_comb;
+
+        lns_comb cand_combs[MAX_ENSSIZE+1];
+
+        int pointers[MAX_NSIZE+1];
+        for (int i = 1; i <= nsize; i++)
+        {
+            pointers[i] = i;
+        }
+
+        int curr_ptr;
+        for (int i = 1; i <= maxcount; i++)
+        {
+            cand_combs[i].ids[0] = nsize;
+            for (int j = 1; j <= nsize; j++)
+            {
+                cand_combs[i].ids[j] = pointers[j];
+            }
+
+            curr_ptr = nsize;
+            while (pointers[curr_ptr] == task_routes[0][0]-nsize+curr_ptr)
+            {
+                curr_ptr --;
+            }
+
+            if (curr_ptr == 0)
+                break;
+
+            pointers[curr_ptr] ++;
+            for (int j = curr_ptr+1; j <= nsize; j++)
+            {
+                pointers[j] = pointers[j-1]+1;
+            }
+        }
+
+        int lns_routes[MAX_NSIZE+1];
+        for (int i = 0; i < maxcount; i++)
+        {
+            memcpy(lns_routes, cand_combs[i].ids, sizeof(cand_combs[i].ids));
+
+            int sel_total_load = 0;
+            for (int j = 1; j <= lns_routes[0]; j++)
+            {
+                sel_total_load += indi->Loads[lns_routes[j]];
+            }
+
+            if (sel_total_load > nsize*capacity)
+                continue;
+
+            int serve_mark[MAX_TASK_TAG_LENGTH];
+            memset(serve_mark, 0, sizeof(serve_mark));
+            serve_mark[0] = task_num;
+            for (int j = 1; j <= lns_routes[0]; j++)
+            {
+                for (int k = 2; k < task_routes[lns_routes[j]][0]; k++)
+                {
+                    serve_mark[task_routes[lns_routes[j]][k]] = 1;
+                    serve_mark[inst_tasks[task_routes[lns_routes[j]][k]].inverse] = 1;
+                }
+            }
+
+            path_scanning(&tmp_indi, inst_tasks, serve_mark);
+
+            for (int j = 1; j <= task_routes[0][0]; j++)
+            {
+                int lnsed = 0;
+                for (int k = 1; k <= lns_routes[0]; k++)
+                {
+                    if (j == lns_routes[k])
+                    {
+                        lnsed = 1;
+                        break;
+                    }
+                }
+                if (lnsed)
+                    continue;
+
+                tmp_indi.Sequence[0] --;
+                JoinArray(tmp_indi.Sequence, task_routes[j]);
+                tmp_indi.Loads[0] ++;
+                tmp_indi.Loads[tmp_indi.Loads[0]] = indi->Loads[j];
+                if (indi->Loads[j] > capacity)
+                    tmp_indi.TotalVioLoad += indi->Loads[j];
+            }
+
+            tmp_indi.TotalCost = get_task_seq_total_cost(tmp_indi.Sequence, inst_tasks);
+            //get_route_seg_length(tmp_indi.route_seg_length, tmp_indi.sequence, inst_tasks);
+            //tmp_indi.max_length = max(tmp_indi.route_seg_length);
+            tmp_indi.Fitness = tmp_indi.TotalCost+coef*tmp_indi.TotalVioLoad;
+
+            if (tmp_indi.Fitness < next_indi.Fitness)
+                indi_copy(&next_indi, &tmp_indi);
+        }
+
+        if (next_indi.Fitness < indi->Fitness)
+            indi_copy(indi, &next_indi);
+    }
+}
 void lns_mut(Individual *c, Individual *p, Individual *best_fsb_solution, Task *inst_tasks)
 {
     indi_copy(c, p);
@@ -544,6 +846,7 @@ void lns_mut(Individual *c, Individual *p, Individual *best_fsb_solution, Task *
         indi_copy(&tmp_indi, c);
 
         // trditional move
+        lns(&tmp_indi, coef, 1, inst_tasks);
 
         if (c->Fitness < tmp_indi.Fitness)
             imp = 1;
@@ -554,6 +857,92 @@ void lns_mut(Individual *c, Individual *p, Individual *best_fsb_solution, Task *
         }
     }
 
+    imp = 1;
+    while (imp)
+    {
+        imp = 0;
+        count ++;
+
+        if (c->TotalVioLoad == 0)
+        {
+            count_fsb ++;
+        } else {
+            count_infsb ++;
+        }
+
+        if (count % 5 == 0)
+        {
+            if (count_fsb == 5)
+            {
+                coef /= 5;
+                c->Fitness = c->TotalCost + coef * c->TotalVioLoad;
+            } else if (count_infsb == 5) {
+                coef *= 5;
+                c->Fitness = c->TotalCost + coef * c->TotalVioLoad;
+            }
+            count_fsb = 0;
+            count_infsb = 0;
+        }
+
+        Individual tmp_indi;
+        indi_copy(&tmp_indi, c);
+
+        // trditional move
+
+        lns(&tmp_indi, coef, 2, inst_tasks);
+
+        if (c->Fitness < tmp_indi.Fitness)
+            imp = 1;
+
+        if (c->TotalVioLoad == 0 && c->TotalCost < best_fsb_solution->TotalCost)
+        {
+            indi_copy(best_fsb_solution, c); // check if assign or not
+        }
+
+    }
+
+    imp = 1;
+    while (imp)
+    {
+        imp = 0;
+        count ++;
+
+        if (c->TotalVioLoad == 0)
+        {
+            count_fsb ++;
+        } else {
+            count_infsb ++;
+        }
+
+        if (count % 5 == 0)
+        {
+            if (count_fsb == 5)
+            {
+                coef /= 5;
+                c->Fitness = c->TotalCost + coef * c->TotalVioLoad;
+            } else if (count_infsb == 5) {
+                coef *= 5;
+                c->Fitness = c->TotalCost + coef * c->TotalVioLoad;
+            }
+            count_fsb = 0;
+            count_infsb = 0;
+        }
+
+        Individual tmp_indi;
+        indi_copy(&tmp_indi, c);
+
+        // trditional move
+
+        lns(&tmp_indi, coef, 1, inst_tasks);
+
+        if (c->Fitness < tmp_indi.Fitness)
+            imp = 1;
+
+        if (c->TotalVioLoad == 0 && c->TotalCost < best_fsb_solution->TotalCost)
+        {
+            indi_copy(best_fsb_solution, c); // check if assign or not
+        }
+    }
 }
 
 void lns(Individual *indi, double coef, int nsize, const Task *inst_tasks)
@@ -594,12 +983,11 @@ void lns(Individual *indi, double coef, int nsize, const Task *inst_tasks)
                     orig_ptr = i + next_move.orig_pos - 1;
 
                 if (seg_ptr2 == next_move.targ_seg && targ_ptr == 0)
-                    orig_ptr = i + next_move.targ_pos - 1;
+                    targ_ptr = i + next_move.targ_pos - 1;
             }
             if (orig_ptr != 0 && targ_ptr != 0)
                 break;
         }
-
         switch (next_move.type) {
             case SI:
                 {
@@ -650,8 +1038,8 @@ void lns(Individual *indi, double coef, int nsize, const Task *inst_tasks)
                 {
                     indi->Sequence[targ_ptr] = next_move.task1;
                     indi->Sequence[orig_ptr] = next_move.task2;
-                    indi->Loads[orig_ptr] -= inst_tasks[next_move.task1].demand - inst_tasks[next_move.task2].demand;
-                    indi->Loads[targ_ptr] += inst_tasks[next_move.task1].demand - inst_tasks[next_move.task2].demand;
+                    indi->Loads[next_move.orig_seg] -= inst_tasks[next_move.task1].demand - inst_tasks[next_move.task2].demand;
+                    indi->Loads[next_move.targ_seg] += inst_tasks[next_move.task1].demand - inst_tasks[next_move.task2].demand;
                 }
                 break;
         }
@@ -661,7 +1049,7 @@ void lns(Individual *indi, double coef, int nsize, const Task *inst_tasks)
         indi->Fitness = next_move.fitness;
         if (indi->Loads[next_move.orig_seg] == 0)
         {
-            if (next_move.total_vio_load == DI && next_move.orig_seg > next_move.targ_seg)
+            if (next_move.type == DI && next_move.orig_seg > next_move.targ_seg)
             {
                 delete_element(indi->Sequence, orig_ptr+1);
             } else {
@@ -672,7 +1060,8 @@ void lns(Individual *indi, double coef, int nsize, const Task *inst_tasks)
         }
 
     }
-    else {
+    else
+    {
 
         int i, j, k;
         // merge and split
@@ -683,7 +1072,7 @@ void lns(Individual *indi, double coef, int nsize, const Task *inst_tasks)
         {
             task_routes[task_routes[0][0]][0] ++;
             task_routes[task_routes[0][0]][task_routes[task_routes[0][0]][0]] = indi->Sequence[i];
-            if (indi->Sequence[i] == 0)
+            if (indi->Sequence[i] == 0 && i < indi->Sequence[0])
             {
                 task_routes[0][0] ++;
                 task_routes[task_routes[0][0]][0] = 1;
@@ -695,7 +1084,7 @@ void lns(Individual *indi, double coef, int nsize, const Task *inst_tasks)
             return;
 
         int multi = task_routes[0][0];
-        long long int ub_trial = task_routes[0][0];
+        long int ub_trial = task_routes[0][0];
         for (i = 1; i < nsize; i++)
         {
             multi --;
@@ -724,7 +1113,6 @@ void lns(Individual *indi, double coef, int nsize, const Task *inst_tasks)
         {
             pointers[i] = i;
         }
-
         int curr_ptr;
         for (i = 1; i <= maxcount; i++)
         {
@@ -755,17 +1143,17 @@ void lns(Individual *indi, double coef, int nsize, const Task *inst_tasks)
         int lns_routes[MAX_NSIZE+1];
         int sel_total_load;
 
-        for (i = 0; i < maxcount; i++)
+        for (i = 1; i <= maxcount; i++)
         {
             memcpy(lns_routes, cand_combs[i].ids, sizeof(cand_combs[i].ids));
 
             sel_total_load = 0;
-            for (j = 1; j < lns_routes[0]; j++)
+            for (j = 1; j <= lns_routes[0]; j++)
             {
                 sel_total_load += indi->Loads[lns_routes[j]];
             }
 
-            if (sel_total_load > capacity)
+            if (sel_total_load > nsize * capacity)
                 continue;
 
             int serve_mark[MAX_TASK_TAG_LENGTH];
@@ -773,7 +1161,7 @@ void lns(Individual *indi, double coef, int nsize, const Task *inst_tasks)
 
             for (j = 1; j <= lns_routes[0]; j++)
             {
-                for (k = 2; k < task_routes[j][0]; k++)
+                for (k = 2; k < task_routes[lns_routes[j]][0]; k++)
                 {
                     serve_mark[task_routes[lns_routes[j]][k]] = 1;
                     serve_mark[inst_tasks[task_routes[lns_routes[j]][k]].inverse] = 1;
@@ -811,9 +1199,11 @@ void lns(Individual *indi, double coef, int nsize, const Task *inst_tasks)
                 indi_copy(&next_indi, &tmp_indi);
         }
 
-        indi_copy(indi, &next_indi);
+        if (next_indi.Fitness < indi->Fitness)
+            indi_copy(indi, &next_indi);
 
     }
+
 }
 
 
@@ -831,7 +1221,7 @@ void single_insertion(Move *best_move, Individual *indi, double coef, const Task
     {
         task_routes[task_routes[0][0]][0] ++;
         task_routes[task_routes[0][0]][task_routes[task_routes[0][0]][0]] = indi->Sequence[i];
-        if (indi->Sequence[0] == 0 && i < indi->Sequence[0])
+        if (indi->Sequence[i] == 0 && i < indi->Sequence[0])
         {
             task_routes[0][0] ++;
             task_routes[task_routes[0][0]][0] = 1;
@@ -967,7 +1357,7 @@ void double_insertion(Move *best_move, Individual *indi, double coef, const Task
     {
         task_routes[task_routes[0][0]][0] ++;
         task_routes[task_routes[0][0]][task_routes[task_routes[0][0]][0]] = indi->Sequence[i];
-        if (indi->Sequence[0] == 0 && i < indi->Sequence[0])
+        if (indi->Sequence[i] == 0 && i < indi->Sequence[0])
         {
             task_routes[0][0] ++;
             task_routes[task_routes[0][0]][0] = 1;
@@ -1213,7 +1603,7 @@ void swap(Move *best_move, Individual *indi, double coef, const Task *inst_tasks
     for (i = 2; i <= indi->Sequence[0]; i++) {
         task_routes[task_routes[0][0]][0]++;
         task_routes[task_routes[0][0]][task_routes[task_routes[0][0]][0]] = indi->Sequence[i];
-        if (indi->Sequence[0] == 0 && i < indi->Sequence[0]) {
+        if (indi->Sequence[i] == 0 && i < indi->Sequence[0]) {
             task_routes[0][0]++;
             task_routes[task_routes[0][0]][0] = 1;
             task_routes[task_routes[0][0]][1] = 0;

@@ -11,7 +11,7 @@
 #include <time.h>
 #include <math.h>
 
-#define MAX_TASKS_TAG_LENGTH 1001
+#define MAX_TASKS_TAG_LENGTH 500
 #define MAX_ARCS_TAG_LENGTH 1001
 #define MAX_NODE_TAG_LENGTH 300
 #define INF 1000000000

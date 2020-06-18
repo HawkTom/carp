@@ -40,16 +40,17 @@ typedef struct move
     double fitness;
 } Move;
 
-void MAENS(Task *inst_tasks);
-
 void rand_scanning(Individual *rs_indi, const Task *inst_tasks, const int *serve_mark);
 void indi_copy(Individual *target, Individual *source);
 void rand_selection(int *id1, int *id2, int popsize);
 void SBX(Individual *xed_child, Individual *p1, Individual *p2, const Task *inst_tasks);
+void lns_mut(Individual *c, Individual *p, Individual *best_fsb_solution, Task *inst_tasks);
 
+void lns(Individual *indi, double coef, int nsize, const Task *inst_tasks);
 
 void single_insertion(Move *best_move, Individual *indi, double coef, const Task *inst_tasks);
 void double_insertion(Move *best_move, Individual *indi, double coef, const Task *inst_tasks);
 void swap(Move *best_move, Individual *indi, double coef, const Task *inst_tasks);
 
+void MAENS(const Task *inst_tasks);
 #endif //CARP_MAENS_H
