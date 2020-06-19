@@ -15,6 +15,24 @@ int rand_choose(int num)
     return k;
 }
 
+void rand_selection(int *id1, int *id2, int popsize)
+/* pop has been sorted increasingly already */
+{
+    int k1, k2;
+    int candi[popsize+1];
+    candi[0] = popsize;
+    for (int i = 1; i <= popsize; i++)
+    {
+        candi[i] = i-1;
+    }
+
+    k1 = rand_choose(candi[0]);
+    *id1 = candi[k1];
+    delete_element(candi, k1);
+    k2 = rand_choose(candi[0]);
+    *id2 = candi[k2];
+}
+
 int max(int *Array)
 {
     int Length = Array[0];

@@ -500,25 +500,6 @@ void SBX(Individual *xed_child, Individual *p1, Individual *p2, const Task *inst
 
 }
 
-void rand_selection(int *id1, int *id2, int popsize)
-/* pop has been sorted increasingly already */
-{
-    int k1, k2;
-    int candi[MAX_POPSIZE+1];
-    candi[0] = popsize;
-    for (int i = 1; i <= popsize; i++)
-    {
-    candi[i] = i-1;
-    }
-
-    k1 = rand_choose(candi[0]);
-    *id1 = candi[k1];
-    delete_element(candi, k1);
-    k2 = rand_choose(candi[0]);
-    *id2 = candi[k2];
-    //printf("id1 = %d, id2 = %d, popsize = %d\n", id1, id2, popsize);
-}
-
 void lns1(Individual *indi, double coef, int nsize, const Task *inst_tasks)
 {
     indi->Fitness = indi->TotalCost+coef*indi->TotalVioLoad;
