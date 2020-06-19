@@ -70,7 +70,7 @@ typedef struct arc
 typedef struct individual
 {
     int Sequence[250]; // task id with depot inside
-    int Assignment[250];
+    int Assignment[250]; // when the representation is chromosome,this is used as the chromosome.
     int TotalCost;
     int Loads[50];
     int TotalVioLoad;

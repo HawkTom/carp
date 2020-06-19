@@ -392,6 +392,8 @@ void augment_merge(Individual *am_indi, const Task *inst_tasks)
         }
     }
 
+    am_indi->TotalCost = get_task_seq_total_cost(am_indi->Sequence, inst_tasks);
+    am_indi->TotalVioLoad = 0;
 
 }
 

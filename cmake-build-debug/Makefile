@@ -150,6 +150,33 @@ LMA/LMA.c.s:
 	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/LMA/LMA.c.s
 .PHONY : LMA/LMA.c.s
 
+LMA/LMAop.o: LMA/LMAop.c.o
+
+.PHONY : LMA/LMAop.o
+
+# target to build an object file
+LMA/LMAop.c.o:
+	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/LMA/LMAop.c.o
+.PHONY : LMA/LMAop.c.o
+
+LMA/LMAop.i: LMA/LMAop.c.i
+
+.PHONY : LMA/LMAop.i
+
+# target to preprocess a source file
+LMA/LMAop.c.i:
+	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/LMA/LMAop.c.i
+.PHONY : LMA/LMAop.c.i
+
+LMA/LMAop.s: LMA/LMAop.c.s
+
+.PHONY : LMA/LMAop.s
+
+# target to generate assembly for a file
+LMA/LMAop.c.s:
+	$(MAKE) -f CMakeFiles/carp.dir/build.make CMakeFiles/carp.dir/LMA/LMAop.c.s
+.PHONY : LMA/LMAop.c.s
+
 MAENS/MAENS.o: MAENS/MAENS.c.o
 
 .PHONY : MAENS/MAENS.o
@@ -459,6 +486,9 @@ help:
 	@echo "... LMA/LMA.o"
 	@echo "... LMA/LMA.i"
 	@echo "... LMA/LMA.s"
+	@echo "... LMA/LMAop.o"
+	@echo "... LMA/LMAop.i"
+	@echo "... LMA/LMAop.s"
 	@echo "... MAENS/MAENS.o"
 	@echo "... MAENS/MAENS.i"
 	@echo "... MAENS/MAENS.s"

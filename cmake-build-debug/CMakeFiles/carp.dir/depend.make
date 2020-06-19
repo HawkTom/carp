@@ -4,6 +4,12 @@
 CMakeFiles/carp.dir/LMA/LMA.c.o: ../LMA/LMA.c
 CMakeFiles/carp.dir/LMA/LMA.c.o: ../LMA/LMA.h
 CMakeFiles/carp.dir/LMA/LMA.c.o: ../functions.h
+CMakeFiles/carp.dir/LMA/LMA.c.o: ../heutistic.h
+
+CMakeFiles/carp.dir/LMA/LMAop.c.o: ../LMA/LMA.h
+CMakeFiles/carp.dir/LMA/LMAop.c.o: ../LMA/LMAop.c
+CMakeFiles/carp.dir/LMA/LMAop.c.o: ../functions.h
+CMakeFiles/carp.dir/LMA/LMAop.c.o: ../heutistic.h
 
 CMakeFiles/carp.dir/MAENS/MAENS.c.o: ../MAENS/MAENS.c
 CMakeFiles/carp.dir/MAENS/MAENS.c.o: ../MAENS/MAENS.h
@@ -37,8 +43,7 @@ CMakeFiles/carp.dir/functions.c.o: ../functions.h
 CMakeFiles/carp.dir/heuristic.c.o: ../functions.h
 CMakeFiles/carp.dir/heuristic.c.o: ../heuristic.c
 
-CMakeFiles/carp.dir/main.c.o: ../MAENS/MAENS.h
-CMakeFiles/carp.dir/main.c.o: ../TSA/TSA.h
+CMakeFiles/carp.dir/main.c.o: ../LMA/LMA.h
 CMakeFiles/carp.dir/main.c.o: ../functions.h
 CMakeFiles/carp.dir/main.c.o: ../heutistic.h
 CMakeFiles/carp.dir/main.c.o: ../main.c
