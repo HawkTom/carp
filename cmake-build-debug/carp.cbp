@@ -85,6 +85,9 @@
 		<Unit filename="/Users/hao/Documents/Projects/carp/LMA/LMAop.c">
 			<Option target="carp"/>
 		</Unit>
+		<Unit filename="/Users/hao/Documents/Projects/carp/LMA/lmals.c">
+			<Option target="carp"/>
+		</Unit>
 		<Unit filename="/Users/hao/Documents/Projects/carp/MAENS/MAENS.c">
 			<Option target="carp"/>
 		</Unit>

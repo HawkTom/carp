@@ -16,7 +16,8 @@ void readMap(Task *inst_tasks, Arc *inst_arcs)
 
     char dummy[50];
 
-    fp = fopen("../egl-e1-C.dat", "r");
+    fp = fopen("../instances/example.dat", "r");
+//    fp = fopen("../egl-e1-C.dat", "r");
 
     while (fscanf(fp, "%s", dummy) != EOF)
     {

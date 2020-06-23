@@ -85,6 +85,7 @@ void LMA(const Task *inst_tasks)
     popsize = tmp_popsize;
     sort_pop(pop, popsize);
 
+//    printf("init: %d \n", pop[0].TotalCost);
     Individual parent1, parent2, xed_child, mted_child, child;
 
     int restarts = 0;
@@ -126,6 +127,12 @@ void LMA(const Task *inst_tasks)
             if (random < Pls)
             {
                 // Do the local search
+                lma_lns(&child, &mted_child, inst_tasks);
+                evaluate_route(&mted_child, inst_tasks);
+                if (!used[mted_child.TotalCost] || mted_child.TotalCost == pop[k-1].TotalCost)
+                {
+                    child = mted_child;
+                }
             }
 
 
@@ -144,7 +151,7 @@ void LMA(const Task *inst_tasks)
                 //resort pop;
                 sort_pop(pop, popsize);
             }
-            break;
+//            break;
         }
 
 
@@ -156,7 +163,7 @@ void LMA(const Task *inst_tasks)
         // partial replacement
         partial_replacement(pop, popsize, MNREP, inst_tasks);
 
-        printf("one iteration\n");
+        printf("one iteration: %d\n", pop[0].TotalCost);
     }
 
 }

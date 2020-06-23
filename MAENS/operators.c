@@ -1009,8 +1009,8 @@ void lns(Individual *indi, double coef, int nsize, const Task *inst_tasks)
                         indi->Loads[0] ++;
                         indi->Loads[indi->Loads[0]] = inst_tasks[next_move.task1].demand + inst_tasks[next_move.task2].demand;
                     } else {
-                        add_element(indi->Sequence, next_move.task1, targ_ptr);
                         add_element(indi->Sequence, next_move.task2, targ_ptr);
+                        add_element(indi->Sequence, next_move.task1, targ_ptr);
                         indi->Loads[next_move.targ_seg] += inst_tasks[next_move.task1].demand + inst_tasks[next_move.task2].demand;
                     }
                 }
