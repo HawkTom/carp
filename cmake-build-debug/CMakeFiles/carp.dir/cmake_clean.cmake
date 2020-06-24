@@ -6,6 +6,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/carp.dir/MAENS/operators.c.o"
   "CMakeFiles/carp.dir/TSA/TSA.c.o"
   "CMakeFiles/carp.dir/TSA/tsals.c.o"
+  "CMakeFiles/carp.dir/VND/VND.c.o"
+  "CMakeFiles/carp.dir/VND/VNDop.c.o"
   "CMakeFiles/carp.dir/arrayoperations.c.o"
   "CMakeFiles/carp.dir/dheuristic.c.o"
   "CMakeFiles/carp.dir/functions.c.o"
