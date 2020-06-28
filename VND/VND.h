@@ -9,4 +9,8 @@
 #include "../functions.h"
 #include "../heutistic.h"
 
+
+void VND(const Task *inst_tasks);
+void vnd_shorten( int *task_seq,  const Task *inst_tasks);
+
 #endif //CARP_VND_H

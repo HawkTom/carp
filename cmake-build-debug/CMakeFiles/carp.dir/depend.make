@@ -36,6 +36,16 @@ CMakeFiles/carp.dir/TSA/tsals.c.o: ../TSA/tsals.c
 CMakeFiles/carp.dir/TSA/tsals.c.o: ../functions.h
 CMakeFiles/carp.dir/TSA/tsals.c.o: ../heutistic.h
 
+CMakeFiles/carp.dir/VND/VND.c.o: ../VND/VND.c
+CMakeFiles/carp.dir/VND/VND.c.o: ../VND/VND.h
+CMakeFiles/carp.dir/VND/VND.c.o: ../functions.h
+CMakeFiles/carp.dir/VND/VND.c.o: ../heutistic.h
+
+CMakeFiles/carp.dir/VND/VNDop.c.o: ../VND/VND.h
+CMakeFiles/carp.dir/VND/VNDop.c.o: ../VND/VNDop.c
+CMakeFiles/carp.dir/VND/VNDop.c.o: ../functions.h
+CMakeFiles/carp.dir/VND/VNDop.c.o: ../heutistic.h
+
 CMakeFiles/carp.dir/arrayoperations.c.o: ../arrayoperations.c
 CMakeFiles/carp.dir/arrayoperations.c.o: ../functions.h
 
@@ -48,7 +58,7 @@ CMakeFiles/carp.dir/functions.c.o: ../functions.h
 CMakeFiles/carp.dir/heuristic.c.o: ../functions.h
 CMakeFiles/carp.dir/heuristic.c.o: ../heuristic.c
 
-CMakeFiles/carp.dir/main.c.o: ../LMA/LMA.h
+CMakeFiles/carp.dir/main.c.o: ../VND/VND.h
 CMakeFiles/carp.dir/main.c.o: ../functions.h
 CMakeFiles/carp.dir/main.c.o: ../heutistic.h
 CMakeFiles/carp.dir/main.c.o: ../main.c

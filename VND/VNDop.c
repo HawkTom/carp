@@ -383,184 +383,54 @@ void vnd_cut(int *split_task_seq, const int *one_task_seq, const Task *inst_task
 void vnd_shorten( int *task_seq,  const Task *inst_tasks)
 {
     // replace shorten by Frederickson heuristic in VND
+    // shorten operator is same as the OPT-2 (for single route) operator in LMA
 
     // task_seq [6 0 t1 t2 t3 t4 0]
-    // input [t1 t2 t3 t4]
-    int i, j, k;
-    // find the path for the given solution, start from the depot
+    int i, u, v;
 
-    int task_id[MAX_NODE_TAG_LENGTH][MAX_NODE_TAG_LENGTH];
-    for (j = 2; j < task_seq[0]; j++)
+    int change_cost;
+    int cost1, cost2;
+    for (u = 1; u <= task_seq[0]-2; u ++)
     {
-        task_id[inst_tasks[task_seq[j]].head_node][inst_tasks[task_seq[j]].tail_node] = task_seq[i];
-        task_id[inst_tasks[task_seq[j]].tail_node][inst_tasks[task_seq[j]].head_node] = task_seq[i];
-    }
-
-
-    int mark_task[250][250];
-    memset(mark_task, 0, sizeof(mark_task));
-
-    int prev_node;
-    int tour[5000];
-    tour[0] = 1;
-    tour[1] = DEPOT;
-
-    tour[0] --;
-    prev_node = DEPOT;
-    for (j = 2; j < task_seq[0]; j++)
-    {
-        JoinArray(tour, shortest_path[prev_node][inst_tasks[task_seq[j]].head_node]);
-        prev_node = inst_tasks[task_seq[j]].tail_node;
-        mark_task[inst_tasks[task_seq[j]].head_node][prev_node] = 1;
-        mark_task[prev_node][inst_tasks[task_seq[j]].head_node] = 1;
-    }
-    JoinArray(tour, shortest_path[prev_node][DEPOT]);
-
-    for (i = 1; i < tour[0]; i++)
-    {
-        if (mark_task[tour[i]][tour[i+1]])
+        for (v = u + 2; v <= task_seq[0]; v ++)
         {
-            mark_task[tour[i]][tour[i+1]] ++;
-            mark_task[tour[i+1]][tour[i]] ++;
-        }
-    }
-
-    int task_flag[tour[0]+1];
-    memset(task_flag, 0, sizeof(task_flag));
-    for (i = 1; i < tour[0]; i++)
-    {
-        if (mark_task[tour[i]][tour[i+1]] == 2)
-        {
-            task_flag[i] = task_id[tour[i]][tour[i+1]];
-        }
-        if (mark_task[tour[i]][tour[i+1]])
-        {
-            mark_task[tour[i]][tour[i+1]] --;
-            mark_task[tour[i+1]][tour[i]] --;
-        }
-    }
+            change_cost = min_cost[inst_tasks[task_seq[u]].tail_node][inst_tasks[task_seq[u+1]].head_node]
+                    + min_cost[inst_tasks[task_seq[v-1]].tail_node][inst_tasks[task_seq[v]].head_node]
+                    - min_cost[inst_tasks[task_seq[u]].tail_node][inst_tasks[task_seq[v-1]].tail_node]
+                    - min_cost[inst_tasks[task_seq[u+1]].head_node][inst_tasks[task_seq[v]].head_node];
 
 
-    int circuit = 0;
-    int v, w = 0, x = 0;
-    v = tour[1];
-    for (i = 1; i < tour[0]; i++)
-    {
-        if (task_flag[i] > 0)
-        {
-            w = i;
-            break;
-        }
-    }
-
-    int exist_task = 0;
-    for (i = w; i < tour[0]; i++)
-    {
-        if (tour[i] > 0)
-        {
-            exist_task = 1;
-        }
-        if( exist_task && tour[i+1] == tour[w] && task_flag[i] == 0)
-        {
-            x = i;
-            circuit = 1;
-            break;
-        }
-    }
-
-    if(circuit)
-    {
-        int next_node = v;
-        // reverse task
-        for (i = x+1; i < tour[0]; i++)
-        {
-            if (task_flag[i] > 0)
+            if (change_cost > 0)
             {
-                next_node = tour[i];
-            }
-        }
-
-        int first_node = 0, last_node = 0;
-        for (i = w; i <= x; i++)
-        {
-            if (task_flag[i] > 0)
-            {
-                first_node = inst_tasks[task_flag[i]].head_node;
-                break;
-            }
-        }
-        for (i = x; i >= w; i--)
-        {
-            if (task_flag[i] > 0)
-            {
-                last_node = inst_tasks[task_flag[i]].tail_node;
-                break;
-            }
-        }
-        int cost_change = 0;
-        cost_change = min_cost[v][first_node] + min_cost[last_node][next_node]
-                 - min_cost[v][last_node] - min_cost[last_node][next_node];
-
-        int new_task_seq[task_seq[0]];
-        new_task_seq[0] = 0;
-
-        // CODE II
-        if (cost_change > 0)
-        {
-            for (i = x; i >= w; i--)
-            {
-                if (task_flag > 0)
+//                cost1 = get_task_seq_total_cost(task_seq, inst_tasks);
+                for (i = u+1; i < v; i++)
                 {
-                    new_task_seq[0] ++;
-                    new_task_seq[new_task_seq[0]] = inst_tasks[task_flag[i]].inverse;
+                    task_seq[i] = inst_tasks[task_seq[i]].inverse;
                 }
-            }
-            for (i = x+1; i < tour[0]; i++)
-            {
-                if (task_flag > 0)
+                int tmp, end;
+                end = v-1;
+                for (i = u+1; i <= (u+v)/2; i++)
                 {
-                    new_task_seq[0] ++;
-                    new_task_seq[new_task_seq[0]] = task_flag[i];
+                    tmp = task_seq[i];
+                    task_seq[i] = task_seq[end];
+                    task_seq[end] = tmp;
+                    end --;
                 }
+//                for (i = u; i <= v; i++)
+//                {
+//                    printf("%d \t", task_seq[i]);
+//                }
+//                printf("\n");
+//                cost2 = get_task_seq_total_cost(task_seq, inst_tasks);
+//                if (cost2+change_cost != cost1)
+//                {
+//                    printf("cost error\n");
+//                }
             }
         }
-
-        // CODE I
-        if (cost_change > 0)
-        {
-            for (i = w; i <= x; i++)
-            {
-                if (task_flag[i] > 0)
-                {
-                    task_flag[i] = inst_tasks[task_flag[i]].inverse;
-                }
-            }
-            int tmp, end;
-            end = x;
-            for (i = w; i < (x+w)/2; i++)
-            {
-                tmp = task_flag[i];
-                task_flag[i] = task_flag[end];
-                task_flag[end] = tmp;
-            }
-        }
-        // task_flag to task_seq;
-
-
-        for (i = 1; i < tour[0]; i++)
-        {
-            if (task_flag > 0)
-            {
-                new_task_seq[0] ++;
-                new_task_seq[new_task_seq[0]] = task_flag[i];
-            }
-        }
-
-
     }
-
-
 }
+
 
 
 

@@ -8,7 +8,8 @@
 #include "heutistic.h"
 //#include "TSA/TSA.h"
 //#include "MAENS/MAENS.h"
-#include "LMA/LMA.h"
+//#include "LMA/LMA.h"
+#include "VND/VND.h"
 
 
 int req_arc_num = 0; //NRA
@@ -66,7 +67,7 @@ int main()
 
     mod_dijkstra();
 //    ShowMatrix(min_cost, vertex_num);
-    LMA(inst_tasks);
+    VND(inst_tasks);
 
 
 

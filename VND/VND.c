@@ -8,7 +8,7 @@
  * Representation: Sequence: 0 task1 task2 task3 0 task4 task5 task6 0 task7 task8 task9 0
  */
 
-void vnd(const Task *inst_tasks)
+void VND(const Task *inst_tasks)
 {
     int i;
 
@@ -21,7 +21,7 @@ void vnd(const Task *inst_tasks)
         Route[i] = i-1;
     }
     FredericksonHeuristic(FHRoute, Route, inst_tasks);
-
+    vnd_shorten(FHRoute, inst_tasks);
     // Sequence
 
 }
