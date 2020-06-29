@@ -23,5 +23,10 @@ void VND(const Task *inst_tasks)
     FredericksonHeuristic(FHRoute, Route, inst_tasks);
     vnd_shorten(FHRoute, inst_tasks);
     // Sequence
+    int new_seq[250];
+    int choice[2] = {1, 1};
+    memset(new_seq, 0, sizeof(new_seq));
+    vnd_switch1(inst_tasks);
+//    vnd_merge_switch(new_seq, FHRoute, choice, inst_tasks);
 
 }
