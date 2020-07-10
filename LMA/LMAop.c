@@ -3,6 +3,7 @@
 //
 
 # include "LMA.h"
+void display_indi(Individual *indi);
 
 int* rand_perm(int num)
 {
@@ -112,6 +113,7 @@ void sort_pop(Individual *pop, int popsize)
 void partial_replacement(Individual *pop, int nc, int nrep, const Task *inst_tasks)
 {
     int i, j, k, done = 0;
+    Individual tmp_indi, best_indi;
     while (done != nrep)
     {
         Individual pool[nrep];
@@ -148,13 +150,16 @@ void partial_replacement(Individual *pop, int nc, int nrep, const Task *inst_tas
         }
         sort_pop(pool, pool_size);
         k = 0;
-        Individual tmp_indi, best_indi;
-        best_indi.TotalCost = INF;
+
+
         while (done != nrep && k != nrep)
         {
+            best_indi.TotalCost = INF;
             k ++;
             if (pool[k-1].TotalCost < pop[nc-1].TotalCost)
             {
+//                display_indi(&pool[k-1]);
+//                printf("case1: (%d, %d)\n", pool[k-1].TotalCost, get_task_seq_total_cost(best_indi.Sequence, inst_tasks));
                 pop[nc-1] = pool[k-1];
                 done ++;
                 sort_pop(pop, nc);
@@ -206,6 +211,8 @@ void partial_replacement(Individual *pop, int nc, int nrep, const Task *inst_tas
 
                 if (best_indi.TotalCost < pop[nc-1].TotalCost)
                 {
+//                    display_indi(&best_indi);
+//                    printf("case2: (%d, %d)\n", best_indi.TotalCost, get_task_seq_total_cost(best_indi.Sequence, inst_tasks));
                     pop[nc-1] = best_indi;
                     done ++;
                     sort_pop(pop, nc);
@@ -213,6 +220,17 @@ void partial_replacement(Individual *pop, int nc, int nrep, const Task *inst_tas
             }
         }
     }
+
+}
+
+void display_indi(Individual *indi)
+{
+    int i;
+    for (i = 1; i <= indi->Assignment[0]; i++)
+    {
+        printf("%d  ", indi->Assignment[i]);
+    }
+    printf("\n");
 }
 
 
