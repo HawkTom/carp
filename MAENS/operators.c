@@ -827,7 +827,8 @@ void lns_mut(Individual *c, Individual *p, Individual *best_fsb_solution, Task *
         indi_copy(&tmp_indi, c);
 
         // trditional move
-        lns(&tmp_indi, coef, 1, inst_tasks);
+        //Fix issue #1 
+        lns(&c, coef, 1, inst_tasks);
 
         if (c->Fitness < tmp_indi.Fitness)
             imp = 1;
